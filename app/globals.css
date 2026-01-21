@@ -1,0 +1,107 @@
+@import "tailwindcss";
+
+body {
+  font-family: "Poppins", "sans-serif";
+  background: url("../public/image/reflect.png") no-repeat center/cover;
+  @apply min-h-screen
+}
+
+.blur {
+  @apply fixed top-0 left-0 h-full w-full -z-10 bg-black/20 backdrop-blur-sm;
+}
+
+.blur2 {
+  @apply bg-slate-900/40 backdrop-blur-md border border-white/15 p-3 rounded;
+}
+
+body::-webkit-scrollbar {
+  @apply w-[5px] bg-transparent;
+}
+
+body::-webkit-scrollbar-thumb {
+  @apply rounded-full bg-blue-900;
+}
+
+.scroll::-webkit-scrollbar {
+  @apply w-0;
+}
+
+.scroll2::-webkit-scrollbar {
+  @apply h-1;
+}
+
+.scroll2::-webkit-scrollbar-thumb {
+  @apply rounded-full bg-slate-900/10
+}
+
+.shadow {
+  box-shadow: -3px -102px 172px 77px rgba(105, 140, 222, 1);
+}
+
+.active_bar::after {
+  content: "";
+  @apply absolute left-0 h-5 w-1 bg-linear-to-r from-blue-600 to-blue-900 rounded;
+}
+
+.box-gradient {
+  @apply drop-shadow-2xl bg-blue-900/40;
+}
+
+.connector::after {
+  content: "";
+  @apply absolute h-1 w-[20%] rounded -left-20 top-[55%] bg-white/25;
+}
+
+.connector::before {
+  content: "";
+  @apply absolute h-4 w-4 rounded-full bg-black drop-shadow-2xl top-[51.5%] -left-20 z-10;
+}
+
+.connector2::after {
+  content: "";
+  @apply absolute h-1 w-[25%] rounded -left-27 top-[55%] bg-white/25;
+}
+
+.connector2::before {
+  content: "";
+  @apply absolute h-4 w-4 rounded-full bg-black drop-shadow-2xl top-[51.5%] -left-30 z-10;
+}
+
+.th {
+  @apply font-normal p-3 text-[0.8rem]
+}
+
+
+.th:first-child {
+  @apply rounded-tl-[15px];
+}
+
+.th:last-child {
+  @apply rounded-tr-[15px];
+}
+
+.text-gradient-placeholder::placeholder {
+  @apply text-transparent bg-clip-text bg-linear-to-r from-purple-700 to-purple-500
+}
+
+@keyframes typing {
+  from { width: 0 }
+  to { width: 100% }
+}
+
+@keyframes blink {
+  50% { border-color: transparent; }
+}
+
+.typing-text {
+  overflow: hidden;        /* Hide the extra text */
+  white-space: nowrap;     /* Keep text in one line */
+  border-right: 2px solid white; /* Cursor effect */
+  width: 0;                /* Start width 0 */
+  animation: typing 4s steps(40) forwards, blink 0.7s step-end infinite;
+}
+
+/*New Table design*/
+.th_td {
+  @apply text-white/30 font-normal text-[0.9rem]
+}

@@ -1,0 +1,75 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model PresUser {
+  id         String    @id @default(uuid())
+  first_name String
+  last_name  String
+  email      String    @unique
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime?
+}
+
+model Seller {
+  id           String    @id @default(uuid())
+  first_name   String
+  last_name    String
+  brand_Name   String
+  email        String    @unique
+  product      String
+  social_media String
+  country      String
+  type         type?     @default(SELLER)
+  interest     String
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime?
+}
+
+model Buyer {
+  id        String    @id @default(uuid())
+  name      String
+  email     String    @unique
+  product   String
+  interest  String
+  type      type?     @default(BUYER)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime?
+}
+
+model Contact {
+  id        String    @id @default(uuid())
+  name      String?
+  email     String?
+  type      type?     @default(CONTACT)
+  message   Message[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime?
+}
+
+model Message {
+  id        String    @id @default(uuid())
+  message   String
+  Contact   Contact?  @relation(fields: [contactId], references: [id])
+  contactId String?
+  type      type?     @default(CONTACT)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime?
+}
+
+enum type {
+  CONTACT
+  SELLER
+  BUYER
+}
