@@ -21,6 +21,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
+
+
     // 2. Create User
     const createUser = await prisma.presUser.create({
       data: { first_name, last_name, email },
@@ -36,7 +38,6 @@ export async function POST(req: NextRequest) {
         email: createUser.email,
       }, // Just the ID is safer
       jwt_secret,
-      { expiresIn: "3h" }
     );
 
     const response = NextResponse.json(
@@ -53,7 +54,7 @@ export async function POST(req: NextRequest) {
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
       path: "/",
-      maxAge: 60 * 60 * 3, // 5 hours in seconds
+      maxAge: 60 * 60 * 24 * 365, // 10 years in seconds
     });
 
     return response;
