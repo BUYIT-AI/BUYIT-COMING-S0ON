@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import Message from "./message";
 import { IoMdEye, IoMdEyeOff } from "react-icons/io";
+import { useRouter } from "next/navigation";
 
 interface FormData {
   email: string;
@@ -32,7 +33,7 @@ export default function LoginForm({
   const [messageText, setMessageText] = useState<string>("");
   const [messageStatus, setMessageStatus] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
-
+const router = useRouter()
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -71,10 +72,13 @@ export default function LoginForm({
         });
 
         // Show container immediately after successful login
+             router.push('/')
         setTimeout(() => {
           openContainer();
           closeLoginForm();
         }, 1500);
+
+   
       } else {
         setMessageStatus(false);
         setMessageText(data.message || "Login failed. Please try again.");
