@@ -21,7 +21,7 @@ export default function Page() {
   const [isLoading, setIsLoading] = useState(true);
   const [container, setContainer] = useState<boolean>(false);
   const [form, setForm] = useState<boolean>(false);
-  const [showLoginForm, setShowLoginForm] = useState<boolean>(true);
+  const [showLoginForm, setShowLoginForm] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [showForgotPassword, setShowForgotPassword] = useState<boolean>(false);
   const [success, setSuccess] = useState<boolean>(false);
