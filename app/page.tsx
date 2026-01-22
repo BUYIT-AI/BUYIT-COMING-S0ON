@@ -154,24 +154,35 @@ export default function Page() {
 
   
   useEffect(() => {
-    const hasToken = document.cookie
-      .split("; ")
-      .find((row) => row.startsWith("token="));
+    const checkAuth = async () => {
+      try {
+        const res = await fetch("/api/verify-token", {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include", // Important: Include cookies
+        });
 
-    if (hasToken) {
-      setContainer(true);
-      setForm(false);
-      setShowLoginForm(false);
-      setIsLoading(false);
-    } else {
-      const timer = setTimeout(() => {
+        if (res.ok) {
+          // Token is valid, show container
+          setContainer(true);
+          setForm(false);
+          setShowLoginForm(false);
+          setIsLoading(false);
+        } else {
+          // Token is invalid or expired, show login form
+          setForm(false);
+          setShowLoginForm(true);
+          setIsLoading(false);
+        }
+      } catch (error) {
+        // Error checking token, show login form
         setForm(false);
-        setShowLoginForm(true)
+        setShowLoginForm(true);
         setIsLoading(false);
-      }, 2500);
+      }
+    };
 
-      return () => clearTimeout(timer);
-    }
+    checkAuth();
   }, []);
 
   if (isLoading) {
