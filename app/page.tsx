@@ -190,7 +190,7 @@ export default function Page() {
                     <div
                       key={i}
                       className={`flex flex-col gap-1 w-full ${
-                        f.name == "email" && "col-span-2"
+                        f.name == "email" || f.name == "password" ? "col-span-2" : ''
                       }`}
                     >
                       <label className="text-[0.9rem] text-white/50">
