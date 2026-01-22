@@ -30,7 +30,10 @@ export default function Header() {
   };
 
   const closeUserMenu = (e: MouseEvent) => {
-    if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+    if (
+      userMenuRef.current &&
+      !userMenuRef.current.contains(e.target as Node)
+    ) {
       setShowUserMenu(false);
     }
   };
@@ -159,62 +162,107 @@ export default function Header() {
           </motion.nav>
         )}
       </AnimatePresence>
-      <button
-        className="font box-gradient w-37.5 md:flex hidden items-center gap-2 justify-center h-10 rounded-full text-[0.9rem] cursor-pointer"
-        onClick={openBookFunc}
-      >
-        Book Now{" "}
-        <span className="h-5 w-5 bg-white text-blue-900 rounded-full flex justify-center items-center">
-          <FaArrowRight size={10} />
-        </span>
-      </button>
+      <div className="flex items-center gap-1">
+        <button
+          className="font box-gradient w-37.5 md:flex hidden items-center gap-2 justify-center h-10 rounded-full text-[0.9rem] cursor-pointer"
+          onClick={openBookFunc}
+        >
+          Book Now{" "}
+          <span className="h-5 w-5 bg-white text-blue-900 rounded-full flex justify-center items-center">
+            <FaArrowRight size={10} />
+          </span>
+        </button>
+        {isLoggedIn && user && (
+          <div className="relative md:block hidden" ref={userMenuRef}>
+            <div
+              onClick={() => setShowUserMenu(!showUserMenu)}
+              className="h-10 w-10 bg-linear-to-br from-purple-600 to-purple-800 rounded-full flex items-center justify-center cursor-pointer hover:from-purple-500 hover:to-purple-700 transition-all duration-200 border border-white/20"
+              title={`${user.first_name} ${user.last_name}`}
+            >
+              <span className="text-white font-semibold text-sm">
+                {getInitials()}
+              </span>
+            </div>
+
+            {/* User Menu Dropdown */}
+            <AnimatePresence>
+              {showUserMenu && (
+                <motion.div
+                  key="user-menu"
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2 }}
+                  className="absolute right-0 mt-2 w-48 bg-white/10 backdrop-blur-md border border-white/12 rounded-lg shadow-lg overflow-hidden z-50"
+                >
+                  <div className="p-4 border-b border-white/10">
+                    <p className="text-white font-semibold text-sm">
+                      {user.first_name} {user.last_name}
+                    </p>
+                    <p className="text-white/60 text-xs">{user.email}</p>
+                  </div>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full px-4 py-2 text-white/80 hover:text-white hover:bg-white/10 flex items-center gap-2 transition-all duration-200"
+                  >
+                    <MdLogout size={16} />
+                    <span>Logout</span>
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        )}
+      </div>
 
       {/* User Profile Avatar */}
-      {isLoggedIn && user && (
-        <div className="relative" ref={userMenuRef}>
-          <div
-            onClick={() => setShowUserMenu(!showUserMenu)}
-            className="h-10 w-10 bg-gradient-to-br from-purple-600 to-purple-800 rounded-full flex items-center justify-center cursor-pointer hover:from-purple-500 hover:to-purple-700 transition-all duration-200 border border-white/20"
-            title={`${user.first_name} ${user.last_name}`}
-          >
-            <span className="text-white font-semibold text-sm">
-              {getInitials()}
-            </span>
-          </div>
 
-          {/* User Menu Dropdown */}
-          <AnimatePresence>
-            {showUserMenu && (
-              <motion.div
-                key="user-menu"
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.2 }}
-                className="absolute right-0 mt-2 w-48 bg-white/10 backdrop-blur-md border border-white/12 rounded-lg shadow-lg overflow-hidden z-50"
-              >
-                <div className="p-4 border-b border-white/10">
-                  <p className="text-white font-semibold text-sm">
-                    {user.first_name} {user.last_name}
-                  </p>
-                  <p className="text-white/60 text-xs">{user.email}</p>
-                </div>
-                <button
-                  onClick={handleLogout}
-                  className="w-full px-4 py-2 text-white/80 hover:text-white hover:bg-white/10 flex items-center gap-2 transition-all duration-200"
+      <div className="md:hidden gap-2 flex item-center flex-row-reverse">
+        <span onClick={openDropDown}>
+          <HiOutlineMenuAlt3 size={35} />
+        </span>
+        {isLoggedIn && user && (
+          <div className="relative" ref={userMenuRef}>
+            <div
+              onClick={() => setShowUserMenu(!showUserMenu)}
+              className="h-10 w-10 bg-linear-to-br from-purple-600 to-purple-800 rounded-full flex items-center justify-center cursor-pointer hover:from-purple-500 hover:to-purple-700 transition-all duration-200 border border-white/20"
+              title={`${user.first_name} ${user.last_name}`}
+            >
+              <span className="text-white font-semibold text-sm">
+                {getInitials()}
+              </span>
+            </div>
+
+            {/* User Menu Dropdown */}
+            <AnimatePresence>
+              {showUserMenu && (
+                <motion.div
+                  key="user-menu"
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2 }}
+                  className="absolute right-0 mt-2 w-48 bg-white/10 backdrop-blur-md border border-white/12 rounded-lg shadow-lg overflow-hidden z-50"
                 >
-                  <MdLogout size={16} />
-                  <span>Logout</span>
-                </button>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      )}
-
-      <span className="md:hidden block" onClick={openDropDown}>
-        <HiOutlineMenuAlt3 size={35} />
-      </span>
+                  <div className="p-4 border-b border-white/10">
+                    <p className="text-white font-semibold text-sm">
+                      {user.first_name} {user.last_name}
+                    </p>
+                    <p className="text-white/60 text-xs">{user.email}</p>
+                  </div>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full px-4 py-2 text-white/80 hover:text-white hover:bg-white/10 flex items-center gap-2 transition-all duration-200"
+                  >
+                    <MdLogout size={16} />
+                    <span>Logout</span>
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
