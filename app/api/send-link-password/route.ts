@@ -2,7 +2,7 @@ import prisma from "@/app/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { SendMessage } from "../lib/message-mail/message_mail";
 
-export async function POST(req: NextRequest, res: NextResponse) {
+export async function POST(req: NextRequest) {
   const body = await req.json();
   const { email } = body;
   const token = Math.random().toString(36).substring(2);
