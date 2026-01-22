@@ -80,6 +80,7 @@ export const PresUserScalarFieldEnum = {
   last_name: 'last_name',
   email: 'email',
   password: 'password',
+  passwordReset: 'passwordReset',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

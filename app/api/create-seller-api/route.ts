@@ -25,8 +25,9 @@ export async function POST(req: NextRequest) {
   ) {
     return NextResponse.json(
       {
+        success: false,
         message: "Missing required fields",
-        status: 401,
+        status: 400,
       },
       { status: 400 }
     );
@@ -41,12 +42,12 @@ export async function POST(req: NextRequest) {
     if (seller) {
       return NextResponse.json(
         {
-          message:
-            "User has already been booked, cancel booking then create a new one.",
-          status: 400,
+          success: false,
+          message: "User has already been booked, cancel booking then create a new one.",
+          status: 409,
           id: seller.id,
         },
-        { status: 400 }
+        { status: 409 }
       );
     }
 
@@ -63,15 +64,23 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    return NextResponse.json({
-      success: true,
-      message: "Seller created successfully",
-      data: createSeller.brand_Name,
-      status: 201,
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        message: "Seller created successfully",
+        data: createSeller,
+        status: 201,
+      },
+      { status: 201 }
+    );
   } catch (error: any) {
     return NextResponse.json(
-      { message: "An error occured", status: 500, error: error.message },
+      {
+        success: false,
+        message: "An error occurred",
+        status: 500,
+        error: error.message,
+      },
       { status: 500 }
     );
   }

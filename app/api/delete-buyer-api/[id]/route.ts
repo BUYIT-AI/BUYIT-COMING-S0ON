@@ -15,16 +15,19 @@ export async function DELETE(
 
     return NextResponse.json(
       {
-        message: `Okay, thanks you can rebook now`,
-        data: deleteUser.name,
-        status: 200
+        success: true,
+        message: "Booking cancelled successfully",
+        data: deleteUser,
+        status: 200,
       },
       { status: 200 }
     );
   } catch (error) {
     return NextResponse.json(
       {
-        message: "Error Deleting User",
+        success: false,
+        message: "Error deleting booking",
+        status: 500,
         error: error,
       },
       { status: 500 }

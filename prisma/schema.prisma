@@ -14,13 +14,14 @@ datasource db {
 }
 
 model PresUser {
-  id         String    @id @default(uuid())
-  first_name String
-  last_name  String
-  email      String    @unique
-  password   String
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime?
+  id            String    @id @default(uuid())
+  first_name    String
+  last_name     String
+  email         String    @unique
+  password      String
+  passwordReset String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime?
 }
 
 model Seller {

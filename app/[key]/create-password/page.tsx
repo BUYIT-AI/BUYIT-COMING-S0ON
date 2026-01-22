@@ -1,38 +1,33 @@
 "use client";
+import Message from "@/app/component/message";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
-import Message from "./message";
 import { IoMdEye, IoMdEyeOff } from "react-icons/io";
 
 interface FormData {
-  email: string;
-  password: string;
+  create_password: string;
+  confirm_password: string;
 }
 
-interface Props {
-  openSignupForm: () => void;
-  closeLoginForm: () => void;
-  openForgotPassword?: () => void;
-  openContainer: () => void;
-  success?: boolean;
-}
+interface Params {}
+
 export default function LoginForm({
-  openSignupForm,
-  closeLoginForm,
-  openForgotPassword,
-  success,
-  openContainer,
-}: Props) {
+  params,
+}: {
+  params: Promise<{ key: string }>;
+}) {
   const [formData, setFormData] = useState<FormData>({
-    email: "",
-    password: "",
+    create_password: "",
+    confirm_password: "",
   });
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showMessage, setShowMessage] = useState<boolean>(false);
   const [messageText, setMessageText] = useState<string>("");
   const [messageStatus, setMessageStatus] = useState<boolean>(false);
-  const [showPassword, setShowPassword] = useState<boolean>(false);
-
+  const [showNewPassword, setShowNewPassword] = useState<boolean>(false);
+  const [showConfirmPassword, setShowConfirmPassword] =
+    useState<boolean>(false);
+  const token = params.then((res) => res.key);
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -42,14 +37,14 @@ export default function LoginForm({
     e.preventDefault();
     setIsLoading(true);
     try {
-      const res = await fetch("/api/create-login-user", {
+      const res = await fetch(`/api/create-new-password${token}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          email: formData.email,
-          password: formData.password,
+          create_password: formData.create_password,
+          confirm_password: formData.create_password,
         }),
       });
 
@@ -64,21 +59,16 @@ export default function LoginForm({
       if (res.ok) {
         setMessageStatus(true);
         setMessageText(data.message || "Login successful!");
-        console.log("Login successful:", data);
+        console.log("Creation successful:", data);
         // Reset form after success
         setFormData({
-          email: "",
-          password: "",
+          create_password: "",
+          confirm_password: "",
         });
-
-        if (success == true) {
-          openContainer();
-          closeLoginForm();
-        }
       } else {
         setMessageStatus(false);
         setMessageText(data.message || "Login failed. Please try again.");
-        console.error("Login failed:", data);
+        console.error("Creation Password failed:", data);
       }
     } catch (error) {
       setIsLoading(false);
@@ -92,21 +82,29 @@ export default function LoginForm({
     }
   };
 
+  const showNewPasswordFunc = () => {
+    setShowNewPassword(!showNewPassword);
+  };
+
+  const showConfirmPasswordFunc = () => {
+    setShowConfirmPassword(!showConfirmPassword);
+  };
+
   const formMap = [
     {
-      name: "email",
-      label: "Email Address",
-      placeholder: "Enter your email address",
-      value: formData.email,
-      type: "email",
+      name: "create_password",
+      label: "New Password",
+      placeholder: "Enter your new password",
+      value: formData.create_password,
+      type: showNewPassword ? "text" : "password",
       onChange: handleChange,
     },
     {
-      name: "password",
-      label: "Password",
-      placeholder: "Enter your password",
-      value: formData.password,
-      type: showPassword ? "text" : "password",
+      name: "confirm_password",
+      label: "Confirm Password",
+      placeholder: "Confirm your new password",
+      value: formData.confirm_password,
+      type: showConfirmPassword ? "text" : "password",
       onChange: handleChange,
     },
   ];
@@ -131,7 +129,7 @@ export default function LoginForm({
         )}
       </AnimatePresence>
       <motion.div
-        key="login-form"
+        key="create-new-form"
         initial={{ opacity: 0, x: 100 }}
         animate={{ opacity: 1, x: 0 }}
         exit={{ opacity: 0, x: 100 }}
@@ -142,10 +140,9 @@ export default function LoginForm({
           noValidate
           className="bg-white/10 md:w-100 w-80 p-4 backdrop-blur-md border border-white/5 rounded flex justify-start items-start flex-col gap-1"
         >
-          <h1 className="text-2xl">Welcome Back</h1>
+          <h1 className="text-2xl">Create New Password</h1>
           <p className="text-white/25 text-[0.9rem]">
-            Welcome to our platform! Please enter your login details to access
-            your account.
+            Please enter your new password below.
           </p>
           <div className={`mt-3 w-full  flex-col flex  gap-4`}>
             {formMap.map((f, i) => (
@@ -166,11 +163,29 @@ export default function LoginForm({
                 />
                 <div
                   className="absolute top-[58%] right-2.5"
-                  onClick={() => setShowPassword(!showPassword)}
+                  onClick={() => showNewPasswordFunc()}
                 >
-                  {f.name === "password" && (
+                  {f.name === "create_password" && (
                     <div>
-                      {showPassword ? (
+                      {showNewPassword ? (
+                        <div>
+                          <IoMdEye />
+                        </div>
+                      ) : (
+                        <div>
+                          <IoMdEyeOff />
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+                <div
+                  className="absolute top-[58%] right-2.5"
+                  onClick={() => showConfirmPasswordFunc()}
+                >
+                  {f.name === "confirm_password" && (
+                    <div>
+                      {showConfirmPassword ? (
                         <div>
                           <IoMdEye />
                         </div>
@@ -185,27 +200,18 @@ export default function LoginForm({
               </div>
             ))}
           </div>
-          <p
+          <a
+            href="/"
             className="my-2 text-[0.9rem] text-purple-500 underline cursor-pointer"
-            onClick={() => {
-              closeLoginForm();
-              openSignupForm();
-            }}
           >
-            Dont have an account ? Sign up
-          </p>
+            Have an account? Log in
+          </a>
           <button
             disabled={isLoading}
             className="h-12 bg-linear-to-r from-purple-600 to-purple-800 w-full my-2 rounded disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? "Logging in..." : "Submit"}
           </button>
-          <p
-            className="text-purple-500 text-[0.9rem] underline w-full text-right"
-            onClick={openForgotPassword}
-          >
-            Forgot Password?
-          </p>
         </form>
       </motion.div>
     </div>

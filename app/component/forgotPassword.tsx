@@ -1,55 +1,31 @@
 "use client";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import Message from "./message";
-import { IoMdEye, IoMdEyeOff } from "react-icons/io";
-
-interface FormData {
-  email: string;
-  password: string;
-}
 
 interface Props {
-  openSignupForm: () => void;
-  closeLoginForm: () => void;
-  openForgotPassword?: () => void;
-  openContainer: () => void;
-  success?: boolean;
+  openLoginForm: () => void;
 }
-export default function LoginForm({
-  openSignupForm,
-  closeLoginForm,
-  openForgotPassword,
-  success,
-  openContainer,
-}: Props) {
-  const [formData, setFormData] = useState<FormData>({
-    email: "",
-    password: "",
-  });
+export default function ForgotPassword({ openLoginForm }: Props) {
+  const [email, setEmail] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showMessage, setShowMessage] = useState<boolean>(false);
   const [messageText, setMessageText] = useState<string>("");
   const [messageStatus, setMessageStatus] = useState<boolean>(false);
-  const [showPassword, setShowPassword] = useState<boolean>(false);
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setEmail(e.target.value);
   };
 
   const handleSubmit = async (e: React.ChangeEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setIsLoading(true);
     try {
-      const res = await fetch("/api/create-login-user", {
+      const res = await fetch("/api/send-link-password", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          email: formData.email,
-          password: formData.password,
+          email: email
         }),
       });
 
@@ -63,32 +39,17 @@ export default function LoginForm({
 
       if (res.ok) {
         setMessageStatus(true);
-        setMessageText(data.message || "Login successful!");
-        console.log("Login successful:", data);
-        // Reset form after success
-        setFormData({
-          email: "",
-          password: "",
-        });
-
-        if (success == true) {
-          openContainer();
-          closeLoginForm();
-        }
+        setMessageText(data.message || "Password reset link sent!");
+        console.log("Forgot password successful:", data);
       } else {
         setMessageStatus(false);
-        setMessageText(data.message || "Login failed. Please try again.");
-        console.error("Login failed:", data);
+        setMessageText(data.message || "Failed to send reset link.");
+        console.error("Forgot password failed:", data);
       }
     } catch (error) {
+        console.error("An error occurred:", error);
       setIsLoading(false);
       setShowMessage(true);
-      setTimeout(() => {
-        setShowMessage(false);
-      }, 3000);
-      setMessageStatus(false);
-      setMessageText("An error occurred. Please try again.");
-      console.error("Login error:", error);
     }
   };
 
@@ -97,16 +58,8 @@ export default function LoginForm({
       name: "email",
       label: "Email Address",
       placeholder: "Enter your email address",
-      value: formData.email,
+      value: email,
       type: "email",
-      onChange: handleChange,
-    },
-    {
-      name: "password",
-      label: "Password",
-      placeholder: "Enter your password",
-      value: formData.password,
-      type: showPassword ? "text" : "password",
       onChange: handleChange,
     },
   ];
@@ -115,7 +68,7 @@ export default function LoginForm({
       <AnimatePresence mode="wait">
         {showMessage && (
           <motion.div
-            key="message-login"
+            key="message-password"
             initial={{ y: "-100%" }}
             animate={{ y: 0 }}
             transition={{ duration: 0.2, ease: "easeIn" }}
@@ -131,7 +84,7 @@ export default function LoginForm({
         )}
       </AnimatePresence>
       <motion.div
-        key="login-form"
+        key="password-form"
         initial={{ opacity: 0, x: 100 }}
         animate={{ opacity: 1, x: 0 }}
         exit={{ opacity: 0, x: 100 }}
@@ -142,19 +95,14 @@ export default function LoginForm({
           noValidate
           className="bg-white/10 md:w-100 w-80 p-4 backdrop-blur-md border border-white/5 rounded flex justify-start items-start flex-col gap-1"
         >
-          <h1 className="text-2xl">Welcome Back</h1>
+          <h1 className="text-2xl">Forgot Password</h1>
           <p className="text-white/25 text-[0.9rem]">
-            Welcome to our platform! Please enter your login details to access
-            your account.
+            Enter your email address and we'll send you a link to reset your
+            password.
           </p>
           <div className={`mt-3 w-full  flex-col flex  gap-4`}>
             {formMap.map((f, i) => (
-              <div
-                key={i}
-                className={`relative flex flex-col gap-1 w-full ${
-                  f.name == "email" && "col-span-2"
-                }`}
-              >
+              <div key={i} className={`relative flex flex-col gap-1 w-full`}>
                 <label className="text-[0.9rem] text-white/50">{f.label}</label>
                 <input
                   type={f.type}
@@ -164,35 +112,16 @@ export default function LoginForm({
                   disabled={isLoading}
                   className="h-12 bg-black/80 border border-white/12 rounded outline-none  px-4 text-white/50 text-[0.8rem] disabled:opacity-50 disabled:cursor-not-allowed"
                 />
-                <div
-                  className="absolute top-[58%] right-2.5"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {f.name === "password" && (
-                    <div>
-                      {showPassword ? (
-                        <div>
-                          <IoMdEye />
-                        </div>
-                      ) : (
-                        <div>
-                          <IoMdEyeOff />
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
               </div>
             ))}
           </div>
           <p
             className="my-2 text-[0.9rem] text-purple-500 underline cursor-pointer"
             onClick={() => {
-              closeLoginForm();
-              openSignupForm();
+              openLoginForm();
             }}
           >
-            Dont have an account ? Sign up
+            I have an account? Log in
           </p>
           <button
             disabled={isLoading}
@@ -200,12 +129,7 @@ export default function LoginForm({
           >
             {isLoading ? "Logging in..." : "Submit"}
           </button>
-          <p
-            className="text-purple-500 text-[0.9rem] underline w-full text-right"
-            onClick={openForgotPassword}
-          >
-            Forgot Password?
-          </p>
+
         </form>
       </motion.div>
     </div>

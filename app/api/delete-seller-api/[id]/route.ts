@@ -15,15 +15,19 @@ export async function DELETE(
 
     return NextResponse.json(
       {
-        message: "Nice deleting User",
-        data: deleteUser.brand_Name
+        success: true,
+        message: "Booking cancelled successfully",
+        data: deleteUser,
+        status: 200,
       },
       { status: 200 }
     );
   } catch (error) {
     return NextResponse.json(
       {
-        message: "Error Deleting User",
+        success: false,
+        message: "Error deleting booking",
+        status: 500,
         error: error,
       },
       { status: 500 }

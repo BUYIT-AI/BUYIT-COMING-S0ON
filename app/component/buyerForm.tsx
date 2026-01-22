@@ -182,13 +182,7 @@ export default function BuyerForm({ backFunc }: Props) {
             <Message
               cancel={() => setShowMessage(false)}
               message={messageText}
-              status={
-                status == 400 || status == 500
-                  ? false
-                  : status == 200 || status == 201
-                  ? true
-                  : false
-              }
+              status={status === 200 || status === 201}
             />
           </motion.div>
         )}

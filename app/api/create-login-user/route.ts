@@ -97,6 +97,7 @@ export async function POST(
           success: false,
           message: "Invalid email or password",
           error: "USER_NOT_FOUND",
+          status: 401,
         },
         { status: 401 }
       );
@@ -126,6 +127,7 @@ export async function POST(
     const response = NextResponse.json(
       {
         success: true,
+        status: 200,
         message: "Login successful",
         token,
         user: {

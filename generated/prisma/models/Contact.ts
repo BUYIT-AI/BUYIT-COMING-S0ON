@@ -339,10 +339,6 @@ export type ContactNullableScalarRelationFilter = {
   isNot?: Prisma.ContactWhereInput | null
 }
 
-export type NullableStringFieldUpdateOperationsInput = {
-  set?: string | null
-}
-
 export type ContactCreateNestedOneWithoutMessageInput = {
   create?: Prisma.XOR<Prisma.ContactCreateWithoutMessageInput, Prisma.ContactUncheckedCreateWithoutMessageInput>
   connectOrCreate?: Prisma.ContactCreateOrConnectWithoutMessageInput

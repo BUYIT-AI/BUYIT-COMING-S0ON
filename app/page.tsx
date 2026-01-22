@@ -5,22 +5,27 @@ import Section from "./component/section";
 import { AnimatePresence, motion } from "framer-motion";
 import Loading from "./loading";
 import LoginForm from "./component/loginForm";
+import { IoMdEye, IoMdEyeOff } from "react-icons/io";
+import ForgotPassword from "./component/forgotPassword";
 interface FormData {
   first_name: string;
   last_name: string;
   email: string;
-  password: string
+  password: string;
 }
 export default function Page() {
   const [isLoading, setIsLoading] = useState(true);
   const [container, setContainer] = useState<boolean>(false);
   const [form, setForm] = useState<boolean>(false);
   const [showLoginForm, setShowLoginForm] = useState<boolean>(true);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [showForgotPassword, setShowForgotPassword] = useState<boolean>(false);
+  const [success, setSuccess] = useState<boolean>(false);
   const [formData, setFormData] = useState<FormData>({
     first_name: "",
     last_name: "",
     email: "",
-    password: ""
+    password: "",
   });
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -51,14 +56,15 @@ export default function Page() {
       console.log(data);
       //To remove the form and put in the container
       setForm(false);
-      setShowLoginForm(false)
-      setContainer(true);
+      setShowLoginForm(true);
+      setContainer(false);
       setFormData({
         first_name: "",
         last_name: "",
         email: "",
-        password: ""
+        password: "",
       });
+      setSuccess(data.success);
     } catch (error) {
       console.error(error);
     }
@@ -89,15 +95,16 @@ export default function Page() {
       type: "email",
       onChange: handleChange,
     },
-        {
+    {
       name: "password",
       label: "Password",
       placeholder: "Enter your password",
       value: formData.password,
-      type: "password",
+      type: showPassword ? "text" : "password",
       onChange: handleChange,
     },
   ];
+
   
   useEffect(() => {
     const hasToken = document.cookie
@@ -123,17 +130,17 @@ export default function Page() {
   if (isLoading) {
     return <Loading />;
   }
-   
+    
 
   const openLoginForm = () => {
     setShowLoginForm(true);
     setForm(false);
-  }
+  };
 
   const openSignupForm = () => {
     setShowLoginForm(false);
     setForm(true);
-  }
+  };
   const containerVariants = {
     hidden: {
       opacity: 0,
@@ -168,7 +175,7 @@ export default function Page() {
         {form && (
           <div className="text-white fixed top-0 left-0 h-full w-full bg-black z-10 flex justify-center items-center">
             <motion.div
-              key="intro-form"
+              key="intro"
               initial={{ opacity: 0, x: 100 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 100 }}
@@ -189,8 +196,10 @@ export default function Page() {
                   {formMap.map((f, i) => (
                     <div
                       key={i}
-                      className={`flex flex-col gap-1 w-full ${
-                        f.name == "email" || f.name == "password" ? "col-span-2" : ''
+                      className={`relative flex flex-col gap-1 w-full ${
+                        f.name == "email" || f.name == "password"
+                          ? "col-span-2"
+                          : ""
                       }`}
                     >
                       <label className="text-[0.9rem] text-white/50">
@@ -203,10 +212,33 @@ export default function Page() {
                         value={f.value}
                         className="h-12 bg-black/80 border border-white/12 rounded outline-none  px-4 text-white/50 text-[0.8rem]"
                       />
+                      <div
+                        className="absolute top-[58%] right-2.5"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {f.name === "password" && (
+                          <div>
+                            {showPassword ? (
+                              <div>
+                                <IoMdEye />
+                              </div>
+                            ) : (
+                              <div>
+                                <IoMdEyeOff />
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   ))}
                 </div>
-                <p className="my-2 text-[0.9rem] text-purple-500 underline cursor-pointer" onClick={openLoginForm}>Already have an account ? Log in</p>
+                <p
+                  className="my-2 text-[0.9rem] text-purple-500 underline cursor-pointer"
+                  onClick={openLoginForm}
+                >
+                  Already have an account ? Log in
+                </p>
                 <button className="h-12 bg-linear-to-r from-purple-600 to-purple-800 w-full my-2 rounded">
                   Submit
                 </button>
@@ -216,7 +248,26 @@ export default function Page() {
         )}
         {showLoginForm && (
           <div className="text-white fixed top-0 left-0 h-full w-full bg-black z-10 flex justify-center items-center">
-            <LoginForm openSignupForm={openSignupForm} closeLoginForm={() => setShowLoginForm(false)} />
+            <LoginForm
+              openSignupForm={openSignupForm}
+              success={success}
+              openContainer={() => {
+                setContainer(true);
+                setShowLoginForm(false);
+              }}
+              closeLoginForm={() => setShowLoginForm(false)}
+              openForgotPassword={() => setShowForgotPassword(true)}
+            />
+          </div>
+        )}
+        {showForgotPassword && (
+          <div className="text-white fixed top-0 left-0 h-full w-full bg-black z-10 flex justify-center items-center">
+            <ForgotPassword
+              openLoginForm={() => {
+                setShowLoginForm(true);
+                setShowForgotPassword(false);
+              }}
+            />
           </div>
         )}
         {container && (
