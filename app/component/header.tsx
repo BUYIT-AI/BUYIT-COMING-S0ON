@@ -47,6 +47,15 @@ export default function Header() {
     };
   }, []);
 
+  const getInitials = () => {
+    if (user) {
+      return `${user.first_name.charAt(0)}${user.last_name.charAt(
+        0
+      )}`.toUpperCase();
+    }
+    return "U";
+  };
+
   // Check if user is logged in
   useEffect(() => {
     const checkUserAuth = async () => {
@@ -69,6 +78,7 @@ export default function Header() {
     };
 
     checkUserAuth();
+    getInitials ();
   }, []);
 
   const openDropDown = () => {
@@ -86,20 +96,30 @@ export default function Header() {
   };
 
   const handleLogout = async () => {
-    // Clear the token cookie by calling logout endpoint or just redirect
-    document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
-    setIsLoggedIn(false);
-    setUser(null);
-    setShowUserMenu(false);
-    router.push("/");
+    try {
+      // Call logout endpoint to clear token on backend
+      const res = await fetch("/api/logout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+      });
+
+      if (res.ok) {
+        // Update local state
+        setIsLoggedIn(false);
+        setUser(null);
+        setShowUserMenu(false);
+
+        // Redirect to home
+        router.push("/");
+      } else {
+        console.error("Logout failed");
+      }
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
   };
 
-  const getInitials = () => {
-    if (user) {
-      return `${user.first_name.charAt(0)}${user.last_name.charAt(0)}`.toUpperCase();
-    }
-    return "U";
-  };
   return (
     <div className="text-white flex justify-between items-center h-full relative">
       <Image
