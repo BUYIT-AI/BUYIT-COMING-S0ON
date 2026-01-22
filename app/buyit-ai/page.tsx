@@ -161,7 +161,7 @@ export default function BuyIt() {
             messages.length > 0 ? "absolute bottom-8 z-20 left-0 flex flex-col justify-center items-center" : "relative"
           } w-full `}
         >
-       <div className="w-[90%] md:w-full bg-black p-3 rounded-[10px]">
+       <div className="w-full bg-black p-3 rounded-[10px]">
            <span className="absolute top-4 text-white">
             <FaWandMagicSparkles />
           </span>
