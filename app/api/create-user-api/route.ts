@@ -58,11 +58,14 @@ export async function POST(req: NextRequest): Promise<NextResponse<SignupRespons
     // Validate password strength
     const passwordValidation = isStrongPassword(password);
     if (!passwordValidation.valid) {
+      // Return detailed validation errors
+      const errorMessages = passwordValidation.errors.join(". ");
       return NextResponse.json(
         {
           success: false,
-          message: "Password does not meet security requirements",
+          message: errorMessages || "Password does not meet security requirements",
           error: "WEAK_PASSWORD",
+          details: passwordValidation.errors,
         },
         { status: 400 }
       );

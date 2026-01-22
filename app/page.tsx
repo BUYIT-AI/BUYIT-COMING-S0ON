@@ -5,14 +5,18 @@ import Section from "./component/section";
 import { AnimatePresence, motion } from "framer-motion";
 import Loading from "./loading";
 import LoginForm from "./component/loginForm";
+import Message from "./component/message";
+import LoadingComponent from "./component/loading";
 import { IoMdEye, IoMdEyeOff } from "react-icons/io";
 import ForgotPassword from "./component/forgotPassword";
+
 interface FormData {
   first_name: string;
   last_name: string;
   email: string;
   password: string;
 }
+
 export default function Page() {
   const [isLoading, setIsLoading] = useState(true);
   const [container, setContainer] = useState<boolean>(false);
@@ -21,19 +25,44 @@ export default function Page() {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [showForgotPassword, setShowForgotPassword] = useState<boolean>(false);
   const [success, setSuccess] = useState<boolean>(false);
+  const [formSubmitting, setFormSubmitting] = useState<boolean>(false);
+  const [showMessage, setShowMessage] = useState<boolean>(false);
+  const [messageText, setMessageText] = useState<string>("");
+  const [messageStatus, setMessageStatus] = useState<boolean>(false);
+  const [passwordStrength, setPasswordStrength] = useState({
+    length: false,
+    uppercase: false,
+    lowercase: false,
+    number: false,
+    special: false,
+  });
+
   const [formData, setFormData] = useState<FormData>({
     first_name: "",
     last_name: "",
     email: "",
     password: "",
   });
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: [value] });
+    setFormData({ ...formData, [name]: value });
+
+    // Check password strength in real-time
+    if (name === "password") {
+      setPasswordStrength({
+        length: value.length >= 8,
+        uppercase: /[A-Z]/.test(value),
+        lowercase: /[a-z]/.test(value),
+        number: /[0-9]/.test(value),
+        special: /[!@#$%^&*]/.test(value),
+      });
+    }
   };
 
   const handleSubmit = async (e: React.ChangeEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setFormSubmitting(true);
 
     try {
       const res = await fetch("/api/create-user-api", {
@@ -48,25 +77,43 @@ export default function Page() {
       });
 
       const data = await res.json();
+      setFormSubmitting(false);
+
+      setShowMessage(true);
+      setTimeout(() => {
+        setShowMessage(false);
+      }, 3000);
 
       if (!res.ok) {
-        return console.log(data.message);
+        setMessageStatus(false);
+        setMessageText(data.message || "Signup failed. Please try again.");
+        return;
       }
 
-      console.log(data);
-      //To remove the form and put in the container
-      setForm(false);
-      setShowLoginForm(true);
-      setContainer(false);
-      setFormData({
-        first_name: "",
-        last_name: "",
-        email: "",
-        password: "",
-      });
-      setSuccess(data.success);
+      setMessageStatus(true);
+      setMessageText(data.message || "Account created successfully!");
+
+      // To remove the form and put in the container
+      setTimeout(() => {
+        setForm(false);
+        setShowLoginForm(true);
+        setContainer(false);
+        setFormData({
+          first_name: "",
+          last_name: "",
+          email: "",
+          password: "",
+        });
+        setSuccess(data.success);
+      }, 2000);
     } catch (error) {
-      console.error(error);
+      setFormSubmitting(false);
+      setShowMessage(true);
+      setTimeout(() => {
+        setShowMessage(false);
+      }, 3000);
+      setMessageStatus(false);
+      setMessageText("An error occurred. Please try again.");
     }
   };
 
@@ -174,6 +221,24 @@ export default function Page() {
       <AnimatePresence mode="wait">
         {form && (
           <div className="text-white fixed top-0 left-0 h-full w-full bg-black z-10 flex justify-center items-center">
+            <AnimatePresence mode="wait">
+              {showMessage && (
+                <motion.div
+                  key="message-signup"
+                  initial={{ y: "-100%" }}
+                  animate={{ y: 0 }}
+                  transition={{ duration: 0.2, ease: "easeIn" }}
+                  exit={{ y: "-100%" }}
+                  className="fixed top-0 left-0 z-30 w-full bg-black py-5 px-3 drop-shadow-2xl transition-all duration-200 overflow-hidden"
+                >
+                  <Message
+                    message={messageText}
+                    cancel={() => setShowMessage(false)}
+                    status={messageStatus}
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
             <motion.div
               key="intro"
               initial={{ opacity: 0, x: 100 }}
@@ -210,10 +275,11 @@ export default function Page() {
                         name={f.name}
                         onChange={f.onChange}
                         value={f.value}
-                        className="h-12 bg-black/80 border border-white/12 rounded outline-none  px-4 text-white/50 text-[0.8rem]"
+                        disabled={formSubmitting}
+                        className="h-12 bg-black/80 border border-white/12 rounded outline-none  px-4 text-white/50 text-[0.8rem] disabled:opacity-50 disabled:cursor-not-allowed"
                       />
                       <div
-                        className="absolute top-[58%] right-2.5"
+                        className="absolute top-[58%] right-2.5 cursor-pointer"
                         onClick={() => setShowPassword(!showPassword)}
                       >
                         {f.name === "password" && (
@@ -233,14 +299,47 @@ export default function Page() {
                     </div>
                   ))}
                 </div>
+
+                {/* Password Strength Indicators */}
+                {formData.password && (
+                  <div className="w-full mt-3 p-3 bg-black/50 rounded border border-white/10">
+                    <p className="text-[0.8rem] text-white/70 mb-2">Password Requirements:</p>
+                    <div className="space-y-1 text-[0.75rem]">
+                      <div className={`flex items-center gap-2 ${passwordStrength.length ? "text-green-400" : "text-white/50"}`}>
+                        <span>{passwordStrength.length ? "✓" : "○"}</span>
+                        <span>At least 8 characters</span>
+                      </div>
+                      <div className={`flex items-center gap-2 ${passwordStrength.uppercase ? "text-green-400" : "text-white/50"}`}>
+                        <span>{passwordStrength.uppercase ? "✓" : "○"}</span>
+                        <span>At least 1 UPPERCASE letter (A-Z)</span>
+                      </div>
+                      <div className={`flex items-center gap-2 ${passwordStrength.lowercase ? "text-green-400" : "text-white/50"}`}>
+                        <span>{passwordStrength.lowercase ? "✓" : "○"}</span>
+                        <span>At least 1 lowercase letter (a-z)</span>
+                      </div>
+                      <div className={`flex items-center gap-2 ${passwordStrength.number ? "text-green-400" : "text-white/50"}`}>
+                        <span>{passwordStrength.number ? "✓" : "○"}</span>
+                        <span>At least 1 number (0-9)</span>
+                      </div>
+                      <div className={`flex items-center gap-2 ${passwordStrength.special ? "text-green-400" : "text-white/50"}`}>
+                        <span>{passwordStrength.special ? "✓" : "○"}</span>
+                        <span>At least 1 special character (!@#$%^&*)</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 <p
                   className="my-2 text-[0.9rem] text-purple-500 underline cursor-pointer"
                   onClick={openLoginForm}
                 >
                   Already have an account ? Log in
                 </p>
-                <button className="h-12 bg-linear-to-r from-purple-600 to-purple-800 w-full my-2 rounded">
-                  Submit
+                <button
+                  disabled={formSubmitting}
+                  className="h-12 bg-linear-to-r from-purple-600 to-purple-800 w-full my-2 rounded disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                >
+                  {formSubmitting ? <LoadingComponent /> : "Submit"}
                 </button>
               </form>
             </motion.div>
