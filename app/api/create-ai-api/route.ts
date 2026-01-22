@@ -1,6 +1,7 @@
 import Groq from "groq-sdk";
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthUser } from "../lib/ai/ai-advice-response/auth";
+import { logger } from "@/app/lib/logger";
 
 const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY,
@@ -69,7 +70,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ message: reply });
   } catch (error) {
-    console.error("SERVER ERROR:", error);
+    logger.error("SERVER ERROR", error);
     return NextResponse.json(
       { error: "Failed to get response" },
       { status: 500 }

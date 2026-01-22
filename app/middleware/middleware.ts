@@ -2,6 +2,10 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { verifyToken } from '@/app/lib/auth';
 
+// Note: Logger cannot be imported in middleware as it checks process.env.NODE_ENV
+// which is handled at build time, not runtime in middleware
+const isDevelopment = process.env.NODE_ENV === "development";
+
 // Protected routes that require authentication
 const protectedRoutes = [
   '/admin',
@@ -54,7 +58,9 @@ export function middleware(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Middleware authentication error:', error);
+    if (isDevelopment) {
+      console.error('Middleware authentication error:', error);
+    }
     
     // If token verification fails, redirect to login
     const url = request.nextUrl.clone();

@@ -124,7 +124,6 @@ export default function SellerForm({ backFunc }: Props) {
         setMessageText(data.message);
         setStatus(data.status);
         setUserId(data.id);
-        console.log(data);
         return false
       }
 

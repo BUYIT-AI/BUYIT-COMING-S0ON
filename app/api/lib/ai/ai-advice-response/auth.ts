@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { verifyToken, JWTPayload } from "@/app/lib/auth";
+import { logger } from "@/app/lib/logger";
 
 export interface AuthUser {
   userId: string;
@@ -18,14 +19,14 @@ export async function getAuthUser(): Promise<AuthUser | null> {
     const token = cookieStore.get("token")?.value;
 
     if (!token) {
-      console.warn("No authentication token found in cookies");
+      logger.warn("No authentication token found in cookies");
       return null;
     }
 
     const decoded = verifyToken(token);
 
     if (!decoded) {
-      console.warn("Token verification failed - token may be invalid or expired");
+      logger.warn("Token verification failed - token may be invalid or expired");
       return null;
     }
 
@@ -36,7 +37,7 @@ export async function getAuthUser(): Promise<AuthUser | null> {
       iat: decoded.iat,
     } as AuthUser;
   } catch (error) {
-    console.error("Error extracting authenticated user:", error);
+    logger.error("Error extracting authenticated user", error);
     return null;
   }
 }

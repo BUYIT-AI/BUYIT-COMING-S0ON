@@ -1,6 +1,7 @@
 import prisma from "@/app/lib/prisma";
 import { NextResponse, NextRequest } from "next/server";
 import { hashPassword, generateToken, isValidEmail, isStrongPassword } from "@/app/lib/auth";
+import { logger } from "@/app/lib/logger";
 
 interface SignupRequestBody {
   first_name: string;
@@ -126,7 +127,7 @@ export async function POST(req: NextRequest): Promise<NextResponse<SignupRespons
 
     return response;
   } catch (error) {
-    console.error("Signup error:", error);
+    logger.error("Signup error", error);
     return NextResponse.json(
       {
         success: false,

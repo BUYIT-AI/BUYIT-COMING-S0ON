@@ -64,7 +64,6 @@ export default function LoginForm({
       if (res.ok) {
         setMessageStatus(true);
         setMessageText(data.message || "Login successful!");
-        console.log("Login successful:", data);
         // Reset form after success
         setFormData({
           email: "",
@@ -78,7 +77,6 @@ export default function LoginForm({
       } else {
         setMessageStatus(false);
         setMessageText(data.message || "Login failed. Please try again.");
-        console.error("Login failed:", data);
       }
     } catch (error) {
       setIsLoading(false);
@@ -88,7 +86,6 @@ export default function LoginForm({
       }, 3000);
       setMessageStatus(false);
       setMessageText("An error occurred. Please try again.");
-      console.error("Login error:", error);
     }
   };
 

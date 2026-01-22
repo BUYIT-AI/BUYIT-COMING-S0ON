@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/app/lib/prisma";
-import * as crypto from "crypto";
-import * as jwt from "jsonwebtoken";
+import { hashPassword, verifyPassword, generateToken } from "@/app/lib/auth";
+import { logger } from "@/app/lib/logger";
 
 interface LoginRequestBody {
   email: string;
@@ -19,37 +19,6 @@ interface LoginResponse {
     last_name: string;
   };
   error?: string;
-}
-
-// Hash password function
-function hashPassword(password: string): string {
-  return crypto.createHash("sha256").update(password).digest("hex");
-}
-
-// Verify password function
-function verifyPassword(password: string, hash: string): boolean {
-  return hashPassword(password) === hash;
-}
-
-// Generate JWT token
-function generateToken(
-  userId: string,
-  email: string,
-  firstName: string
-): string {
-  const secret = process.env.JWT_SECRET || "your-secret-key";
-  return jwt.sign(
-    {
-      userId,
-      first_name: firstName,
-      email,
-      iat: Math.floor(Date.now() / 1000),
-    },
-    secret,
-    {
-      expiresIn: "1h",
-    }
-  );
 }
 
 export async function POST(
@@ -151,7 +120,7 @@ export async function POST(
 
     return response;
   } catch (error) {
-    console.error("Login error:", error);
+    logger.error("Login error", error);
     return NextResponse.json(
       {
         success: false,
