@@ -72,11 +72,10 @@ const router = useRouter()
         });
 
         // Show container immediately after successful login
-             router.push('/')
         setTimeout(() => {
           openContainer();
           closeLoginForm();
-        }, 1500);
+        }, 3000);
 
    
       } else {
