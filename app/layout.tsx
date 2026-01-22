@@ -23,9 +23,9 @@ export default function HomeLayout({
   const [form, setForm] = useState<boolean>(false);
   return (
     <html>
-      <Head>
+      <head>
         <link rel="icon" href="/image/buyitlogo.png" />
-      </Head>
+      </head>
       <body className={` ${poppins.variable} md:px-20 px-5`}>
         {/* Header with its own animation */}
         <div className="blur"></div>

@@ -15,6 +15,7 @@ interface UserData {
   email: string;
 }
 
+
 export default function Header() {
   const dropRef = useRef<HTMLDivElement | null>(null);
   const [showDropdown, setDropDown] = useState<boolean>(false);
@@ -112,6 +113,7 @@ export default function Header() {
 
         // Dispatch logout event to notify page
         window.dispatchEvent(new CustomEvent("userLogout"));
+        router.push("/");
       } else {
         console.error("Logout failed");
       }
