@@ -20,7 +20,7 @@ export default function HomeLayout({
   const [form, setForm] = useState<boolean>(false);
   return (
     <html>
-      <body className={` ${poppins.variable} md:px-20 px-8`}>
+      <body className={` ${poppins.variable} md:px-20 px-5`}>
         {/* Header with its own animation */}
         <div className="blur"></div>
         <motion.div

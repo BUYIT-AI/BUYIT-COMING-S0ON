@@ -90,8 +90,8 @@ export default function BuyIt() {
         className={`${
           messages.length > 0
             ? "fixed top-0 left-0 h-full w-full rounded-none"
-            : "rounded-[30px]"
-        } bg-[#202427]/40 drop-shadow-2xl backdrop-blur-md p-6 flex flex-col gap-4 transition-all duration-150`}
+            : "rounded-[30px] md:w-auto w-full"
+        } bg-[#202427]/40 drop-shadow-2xl backdrop-blur-md md:p-6 p-3 flex flex-col gap-4 transition-all duration-150`}
       >
         {messages.length === 0 ? (
           <div className="flex flex-col gap-2 justify-center items-center mb-8">
@@ -103,7 +103,7 @@ export default function BuyIt() {
             </p>
           </div>
         ) : (
-          <div className="flex flex-col gap-4 h-full overflow-y-auto scroll px-1 md:mb-[7.1rem] mb-[8.7rem] relative">
+          <div className="flex flex-col gap-4 h-full overflow-y-auto scroll px-1 md:mb-[7.1rem] mb-[8.7rem] relative w-full">
             <div
               className="fixed top-0 left-0 p-3 cursor-pointer"
               onClick={() => {
@@ -131,11 +131,11 @@ export default function BuyIt() {
                   {msg.sender === "user" ? (
                     <FaCircleUser color="white" />
                   ) : (
-                    <Image src={logo} alt="logo" width={20} height={20} />
+                    <Image src={logo} alt="logo" width={10} height={10} />
                   )}
                 </span>
                 <div
-                  className="px-5 py-4 rounded bg-black/20 text-white max-w-[70%] wrap-break-word"
+                  className="md:px-5 px-2 py-4 rounded bg-black/20 text-white md:max-w-[70%] wrap-break-word"
                   dangerouslySetInnerHTML={{ __html: msg.text }}
                 />
               </div>
@@ -158,10 +158,11 @@ export default function BuyIt() {
         {/* Input Area */}
         <div
           className={`${
-            messages.length > 0 ? "absolute bottom-8 z-20" : "relative"
-          } md:w-[95%] w-[92%] bg-black p-3 rounded-[10px]`}
+            messages.length > 0 ? "absolute bottom-8 z-20 left-0 flex flex-col justify-center items-center" : "relative"
+          } w-full `}
         >
-          <span className="absolute top-4 text-white">
+       <div className="w-[90%] md:w-full bg-black p-3 rounded-[10px]">
+           <span className="absolute top-4 text-white">
             <FaWandMagicSparkles />
           </span>
           <textarea
@@ -209,6 +210,7 @@ export default function BuyIt() {
               <FaArrowUp />
             </button>
           </div>
+       </div>
         </div>
       </motion.div>
     </div>

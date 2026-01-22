@@ -1,19 +1,42 @@
 import { cookies } from "next/headers";
-import jwt from "jsonwebtoken";
+import { verifyToken, JWTPayload } from "@/app/lib/auth";
 
-export async function getAuthUser() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("token")?.value;
-  const jwt_secret = process.env.jwt_secret || "Your secret key";
+export interface AuthUser {
+  userId: string;
+  first_name: string;
+  email: string;
+  iat: number;
+}
 
-  if (!token) return null;
+/**
+ * Get authenticated user from token cookie
+ * Extracts userId, first_name, and email from token
+ */
+export async function getAuthUser(): Promise<AuthUser | null> {
   try {
-    const decoded = jwt.verify(token, jwt_secret) as {
-      first_name: string;
-    };
+    const cookieStore = await cookies();
+    const token = cookieStore.get("token")?.value;
 
-    return decoded;
+    if (!token) {
+      console.warn("No authentication token found in cookies");
+      return null;
+    }
+
+    const decoded = verifyToken(token);
+
+    if (!decoded) {
+      console.warn("Token verification failed - token may be invalid or expired");
+      return null;
+    }
+
+    return {
+      userId: decoded.userId,
+      first_name: decoded.first_name,
+      email: decoded.email,
+      iat: decoded.iat,
+    } as AuthUser;
   } catch (error) {
+    console.error("Error extracting authenticated user:", error);
     return null;
   }
 }

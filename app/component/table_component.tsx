@@ -5,7 +5,6 @@ import LoadingComponent from "./loading";
 import { MdDelete, MdRefresh } from "react-icons/md";
 import { IoMdTrash } from "react-icons/io";
 import { PiSelection } from "react-icons/pi";
-import { u } from "framer-motion/client";
 
 interface Contact {
   id: string;

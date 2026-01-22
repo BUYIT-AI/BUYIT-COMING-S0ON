@@ -205,16 +205,16 @@ export type ContactOrderByWithRelationInput = {
 
 export type ContactWhereUniqueInput = Prisma.AtLeast<{
   id?: string
-  email?: string
   AND?: Prisma.ContactWhereInput | Prisma.ContactWhereInput[]
   OR?: Prisma.ContactWhereInput[]
   NOT?: Prisma.ContactWhereInput | Prisma.ContactWhereInput[]
   name?: Prisma.StringNullableFilter<"Contact"> | string | null
+  email?: Prisma.StringNullableFilter<"Contact"> | string | null
   type?: Prisma.EnumtypeNullableFilter<"Contact"> | $Enums.type | null
   createdAt?: Prisma.DateTimeFilter<"Contact"> | Date | string
   updatedAt?: Prisma.DateTimeNullableFilter<"Contact"> | Date | string | null
   message?: Prisma.MessageListRelationFilter
-}, "id" | "email">
+}, "id">
 
 export type ContactOrderByWithAggregationInput = {
   id?: Prisma.SortOrder

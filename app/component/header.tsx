@@ -77,7 +77,7 @@ export default function Header() {
               Contact
             </Link>
             <Link
-              href="/contact"
+              href="/buyit-ai"
               className="mx-9"
               onClick={() => setDropDown(false)}
             >

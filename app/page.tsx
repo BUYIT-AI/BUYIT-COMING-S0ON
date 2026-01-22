@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Section from "./component/section";
 import { AnimatePresence, motion } from "framer-motion";
 import Loading from "./loading";
+import LoginForm from "./component/loginForm";
 interface FormData {
   first_name: string;
   last_name: string;
@@ -12,7 +13,8 @@ interface FormData {
 export default function Page() {
   const [isLoading, setIsLoading] = useState(true);
   const [container, setContainer] = useState<boolean>(false);
-  const [form, setForm] = useState<boolean>(true);
+  const [form, setForm] = useState<boolean>(false);
+  const [showLoginForm, setShowLoginForm] = useState<boolean>(true);
   const [formData, setFormData] = useState<FormData>({
     first_name: "",
     last_name: "",
@@ -46,6 +48,7 @@ export default function Page() {
       console.log(data);
       //To remove the form and put in the container
       setForm(false);
+      setShowLoginForm(false)
       setContainer(true);
       setFormData({
         first_name: "",
@@ -83,6 +86,7 @@ export default function Page() {
       onChange: handleChange,
     },
   ];
+  
   useEffect(() => {
     const hasToken = document.cookie
       .split("; ")
@@ -91,10 +95,12 @@ export default function Page() {
     if (hasToken) {
       setContainer(true);
       setForm(false);
+      setShowLoginForm(false);
       setIsLoading(false);
     } else {
       const timer = setTimeout(() => {
-        setForm(true);
+        setForm(false);
+        setShowLoginForm(true)
         setIsLoading(false);
       }, 2500);
 
@@ -104,6 +110,17 @@ export default function Page() {
 
   if (isLoading) {
     return <Loading />;
+  }
+   
+
+  const openLoginForm = () => {
+    setShowLoginForm(true);
+    setForm(false);
+  }
+
+  const openSignupForm = () => {
+    setShowLoginForm(false);
+    setForm(true);
   }
   const containerVariants = {
     hidden: {
@@ -177,11 +194,17 @@ export default function Page() {
                     </div>
                   ))}
                 </div>
+                <p className="my-2 text-[0.9rem] text-purple-500 underline cursor-pointer" onClick={openLoginForm}>Already have an account ? Log in</p>
                 <button className="h-12 bg-linear-to-r from-purple-600 to-purple-800 w-full my-2 rounded">
                   Submit
                 </button>
               </form>
             </motion.div>
+          </div>
+        )}
+        {showLoginForm && (
+          <div className="text-white fixed top-0 left-0 h-full w-full bg-black z-10 flex justify-center items-center">
+            <LoginForm openSignupForm={openSignupForm} closeLoginForm={() => setShowLoginForm(false)} />
           </div>
         )}
         {container && (

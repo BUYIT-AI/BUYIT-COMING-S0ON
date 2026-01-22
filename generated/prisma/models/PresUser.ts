@@ -29,6 +29,7 @@ export type PresUserMinAggregateOutputType = {
   first_name: string | null
   last_name: string | null
   email: string | null
+  password: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -38,6 +39,7 @@ export type PresUserMaxAggregateOutputType = {
   first_name: string | null
   last_name: string | null
   email: string | null
+  password: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -47,6 +49,7 @@ export type PresUserCountAggregateOutputType = {
   first_name: number
   last_name: number
   email: number
+  password: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -58,6 +61,7 @@ export type PresUserMinAggregateInputType = {
   first_name?: true
   last_name?: true
   email?: true
+  password?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -67,6 +71,7 @@ export type PresUserMaxAggregateInputType = {
   first_name?: true
   last_name?: true
   email?: true
+  password?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -76,6 +81,7 @@ export type PresUserCountAggregateInputType = {
   first_name?: true
   last_name?: true
   email?: true
+  password?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -158,6 +164,7 @@ export type PresUserGroupByOutputType = {
   first_name: string
   last_name: string
   email: string
+  password: string
   createdAt: Date
   updatedAt: Date | null
   _count: PresUserCountAggregateOutputType | null
@@ -188,6 +195,7 @@ export type PresUserWhereInput = {
   first_name?: Prisma.StringFilter<"PresUser"> | string
   last_name?: Prisma.StringFilter<"PresUser"> | string
   email?: Prisma.StringFilter<"PresUser"> | string
+  password?: Prisma.StringFilter<"PresUser"> | string
   createdAt?: Prisma.DateTimeFilter<"PresUser"> | Date | string
   updatedAt?: Prisma.DateTimeNullableFilter<"PresUser"> | Date | string | null
 }
@@ -197,6 +205,7 @@ export type PresUserOrderByWithRelationInput = {
   first_name?: Prisma.SortOrder
   last_name?: Prisma.SortOrder
   email?: Prisma.SortOrder
+  password?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrderInput | Prisma.SortOrder
 }
@@ -209,6 +218,7 @@ export type PresUserWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.PresUserWhereInput | Prisma.PresUserWhereInput[]
   first_name?: Prisma.StringFilter<"PresUser"> | string
   last_name?: Prisma.StringFilter<"PresUser"> | string
+  password?: Prisma.StringFilter<"PresUser"> | string
   createdAt?: Prisma.DateTimeFilter<"PresUser"> | Date | string
   updatedAt?: Prisma.DateTimeNullableFilter<"PresUser"> | Date | string | null
 }, "id" | "email">
@@ -218,6 +228,7 @@ export type PresUserOrderByWithAggregationInput = {
   first_name?: Prisma.SortOrder
   last_name?: Prisma.SortOrder
   email?: Prisma.SortOrder
+  password?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.PresUserCountOrderByAggregateInput
@@ -233,6 +244,7 @@ export type PresUserScalarWhereWithAggregatesInput = {
   first_name?: Prisma.StringWithAggregatesFilter<"PresUser"> | string
   last_name?: Prisma.StringWithAggregatesFilter<"PresUser"> | string
   email?: Prisma.StringWithAggregatesFilter<"PresUser"> | string
+  password?: Prisma.StringWithAggregatesFilter<"PresUser"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"PresUser"> | Date | string
   updatedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"PresUser"> | Date | string | null
 }
@@ -242,6 +254,7 @@ export type PresUserCreateInput = {
   first_name: string
   last_name: string
   email: string
+  password: string
   createdAt?: Date | string
   updatedAt?: Date | string | null
 }
@@ -251,6 +264,7 @@ export type PresUserUncheckedCreateInput = {
   first_name: string
   last_name: string
   email: string
+  password: string
   createdAt?: Date | string
   updatedAt?: Date | string | null
 }
@@ -260,6 +274,7 @@ export type PresUserUpdateInput = {
   first_name?: Prisma.StringFieldUpdateOperationsInput | string
   last_name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
@@ -269,6 +284,7 @@ export type PresUserUncheckedUpdateInput = {
   first_name?: Prisma.StringFieldUpdateOperationsInput | string
   last_name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
@@ -278,6 +294,7 @@ export type PresUserCreateManyInput = {
   first_name: string
   last_name: string
   email: string
+  password: string
   createdAt?: Date | string
   updatedAt?: Date | string | null
 }
@@ -287,6 +304,7 @@ export type PresUserUpdateManyMutationInput = {
   first_name?: Prisma.StringFieldUpdateOperationsInput | string
   last_name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
@@ -296,6 +314,7 @@ export type PresUserUncheckedUpdateManyInput = {
   first_name?: Prisma.StringFieldUpdateOperationsInput | string
   last_name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
@@ -305,6 +324,7 @@ export type PresUserCountOrderByAggregateInput = {
   first_name?: Prisma.SortOrder
   last_name?: Prisma.SortOrder
   email?: Prisma.SortOrder
+  password?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -314,6 +334,7 @@ export type PresUserMaxOrderByAggregateInput = {
   first_name?: Prisma.SortOrder
   last_name?: Prisma.SortOrder
   email?: Prisma.SortOrder
+  password?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -323,6 +344,7 @@ export type PresUserMinOrderByAggregateInput = {
   first_name?: Prisma.SortOrder
   last_name?: Prisma.SortOrder
   email?: Prisma.SortOrder
+  password?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -346,6 +368,7 @@ export type PresUserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   first_name?: boolean
   last_name?: boolean
   email?: boolean
+  password?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["presUser"]>
@@ -355,6 +378,7 @@ export type PresUserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   first_name?: boolean
   last_name?: boolean
   email?: boolean
+  password?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["presUser"]>
@@ -364,6 +388,7 @@ export type PresUserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   first_name?: boolean
   last_name?: boolean
   email?: boolean
+  password?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["presUser"]>
@@ -373,11 +398,12 @@ export type PresUserSelectScalar = {
   first_name?: boolean
   last_name?: boolean
   email?: boolean
+  password?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type PresUserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "first_name" | "last_name" | "email" | "createdAt" | "updatedAt", ExtArgs["result"]["presUser"]>
+export type PresUserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "first_name" | "last_name" | "email" | "password" | "createdAt" | "updatedAt", ExtArgs["result"]["presUser"]>
 
 export type $PresUserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "PresUser"
@@ -387,6 +413,7 @@ export type $PresUserPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     first_name: string
     last_name: string
     email: string
+    password: string
     createdAt: Date
     updatedAt: Date | null
   }, ExtArgs["result"]["presUser"]>
@@ -816,6 +843,7 @@ export interface PresUserFieldRefs {
   readonly first_name: Prisma.FieldRef<"PresUser", 'String'>
   readonly last_name: Prisma.FieldRef<"PresUser", 'String'>
   readonly email: Prisma.FieldRef<"PresUser", 'String'>
+  readonly password: Prisma.FieldRef<"PresUser", 'String'>
   readonly createdAt: Prisma.FieldRef<"PresUser", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"PresUser", 'DateTime'>
 }

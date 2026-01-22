@@ -6,11 +6,11 @@ import { FaArrowRight } from "react-icons/fa";
 export default function Section() {
   const router = useRouter()
   return (
-    <div className="flex justify-center items-center text-center flex-col lg:h-full min-h-[80vh] gap-5">
+    <div className="flex justify-center items-center text-center flex-col lg:h-full min-h-[80vh] gap-5 w-full">
       <span className="py-2 px-3 text-white border border-white rounded-full">
         COMING SOON
       </span>
-      <h1 className="text-[75px] w-full text-white font-bold">
+      <h1 className="md:text-[75px] text-[50px] w-full text-white text-center font-bold">
         The Future of Shopping is Almost Here…
       </h1>
       <p className="text-white/80 text-center md:w-125.25 text-[0.9rem]">
