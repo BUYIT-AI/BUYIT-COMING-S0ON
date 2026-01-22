@@ -70,10 +70,11 @@ export default function LoginForm({
           password: "",
         });
 
-        if (success == true) {
+        // Show container immediately after successful login
+        setTimeout(() => {
           openContainer();
           closeLoginForm();
-        }
+        }, 1500);
       } else {
         setMessageStatus(false);
         setMessageText(data.message || "Login failed. Please try again.");

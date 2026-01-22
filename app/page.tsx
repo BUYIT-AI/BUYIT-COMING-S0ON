@@ -220,7 +220,7 @@ export default function Page() {
     <div>
       <AnimatePresence mode="wait">
         {form && (
-          <div className="text-white fixed top-0 left-0 h-full w-full bg-black z-10 flex justify-center items-center">
+          <div className="text-white fixed top-0 left-0 h-full w-full bg-black z-10 flex justify-center items-center overflow-y-auto scroll">
             <AnimatePresence mode="wait">
               {showMessage && (
                 <motion.div
@@ -346,7 +346,7 @@ export default function Page() {
           </div>
         )}
         {showLoginForm && (
-          <div className="text-white fixed top-0 left-0 h-full w-full bg-black z-10 flex justify-center items-center">
+          <div className="text-white fixed top-0 left-0 h-full w-full bg-black z-10 flex justify-center items-center overflow-y-auto scroll">
             <LoginForm
               openSignupForm={openSignupForm}
               success={success}
