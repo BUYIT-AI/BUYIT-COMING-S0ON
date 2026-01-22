@@ -71,11 +71,14 @@ const router = useRouter()
           password: "",
         });
 
+        // Dispatch event to notify header to refresh user data immediately
+        window.dispatchEvent(new CustomEvent("userLogin"));
+
         // Show container immediately after successful login
         setTimeout(() => {
           openContainer();
           closeLoginForm();
-        }, 3000);
+        }, 1500);
 
    
       } else {

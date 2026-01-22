@@ -80,6 +80,10 @@ export default function Header() {
 
     checkUserAuth();
     getInitials();
+
+    // Listen for login event to refresh user data immediately
+    window.addEventListener("userLogin", checkUserAuth);
+    return () => window.removeEventListener("userLogin", checkUserAuth);
   }, []);
 
   const openDropDown = () => {
