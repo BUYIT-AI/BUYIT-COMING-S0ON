@@ -4,6 +4,7 @@ import * as jwt from "jsonwebtoken";
 export interface JWTPayload {
   userId: string;
   first_name: string;
+  last_name: string;
   email: string;
   iat: number;
 }
@@ -35,14 +36,15 @@ export function verifyPassword(password: string, hash: string): boolean {
 export function generateToken(
   userId: string,
   firstName: string,
+  lastName: string,
   email: string,
-  
 ): string {
   const secret = process.env.JWT_SECRET || "your-secret-key";
   return jwt.sign(
     {
       userId,
       first_name: firstName,
+      last_name: lastName,
       email,
       iat: Math.floor(Date.now() / 1000),
     },

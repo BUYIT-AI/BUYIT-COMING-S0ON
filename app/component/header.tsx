@@ -7,29 +7,95 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { FaArrowRight } from "react-icons/fa";
 import { HiOutlineMenuAlt3 } from "react-icons/hi";
+import { MdLogout } from "react-icons/md";
+
+interface UserData {
+  first_name: string;
+  last_name: string;
+  email: string;
+}
+
 export default function Header() {
   const dropRef = useRef<HTMLDivElement | null>(null);
   const [showDropdown, setDropDown] = useState<boolean>(false);
+  const [showUserMenu, setShowUserMenu] = useState<boolean>(false);
+  const [user, setUser] = useState<UserData | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const userMenuRef = useRef<HTMLDivElement | null>(null);
+
   const closeDropdown = (e: MouseEvent) => {
     if (dropRef.current && !dropRef.current.contains(e.target as Node)) {
       setDropDown(false);
     }
   };
+
+  const closeUserMenu = (e: MouseEvent) => {
+    if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+      setShowUserMenu(false);
+    }
+  };
+
   useEffect(() => {
     document.addEventListener("mousedown", closeDropdown);
-    return () => document.removeEventListener("mousedown", closeDropdown);
+    document.addEventListener("mousedown", closeUserMenu);
+    return () => {
+      document.removeEventListener("mousedown", closeDropdown);
+      document.removeEventListener("mousedown", closeUserMenu);
+    };
+  }, []);
+
+  // Check if user is logged in
+  useEffect(() => {
+    const checkUserAuth = async () => {
+      try {
+        const res = await fetch("/api/verify-token", {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          setUser(data.user);
+          setIsLoggedIn(true);
+        } else {
+          setIsLoggedIn(false);
+        }
+      } catch (error) {
+        setIsLoggedIn(false);
+      }
+    };
+
+    checkUserAuth();
   }, []);
 
   const openDropDown = () => {
     setDropDown(true);
   };
+
   const router = useRouter();
+
   const openHomePage = () => {
     router.push("/");
   };
 
   const openBookFunc = () => {
     router.push("/book");
+  };
+
+  const handleLogout = async () => {
+    // Clear the token cookie by calling logout endpoint or just redirect
+    document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+    setIsLoggedIn(false);
+    setUser(null);
+    setShowUserMenu(false);
+    router.push("/");
+  };
+
+  const getInitials = () => {
+    if (user) {
+      return `${user.first_name.charAt(0)}${user.last_name.charAt(0)}`.toUpperCase();
+    }
+    return "U";
   };
   return (
     <div className="text-white flex justify-between items-center h-full relative">
@@ -102,6 +168,49 @@ export default function Header() {
           <FaArrowRight size={10} />
         </span>
       </button>
+
+      {/* User Profile Avatar */}
+      {isLoggedIn && user && (
+        <div className="relative" ref={userMenuRef}>
+          <div
+            onClick={() => setShowUserMenu(!showUserMenu)}
+            className="h-10 w-10 bg-gradient-to-br from-purple-600 to-purple-800 rounded-full flex items-center justify-center cursor-pointer hover:from-purple-500 hover:to-purple-700 transition-all duration-200 border border-white/20"
+            title={`${user.first_name} ${user.last_name}`}
+          >
+            <span className="text-white font-semibold text-sm">
+              {getInitials()}
+            </span>
+          </div>
+
+          {/* User Menu Dropdown */}
+          <AnimatePresence>
+            {showUserMenu && (
+              <motion.div
+                key="user-menu"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
+                className="absolute right-0 mt-2 w-48 bg-white/10 backdrop-blur-md border border-white/12 rounded-lg shadow-lg overflow-hidden z-50"
+              >
+                <div className="p-4 border-b border-white/10">
+                  <p className="text-white font-semibold text-sm">
+                    {user.first_name} {user.last_name}
+                  </p>
+                  <p className="text-white/60 text-xs">{user.email}</p>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className="w-full px-4 py-2 text-white/80 hover:text-white hover:bg-white/10 flex items-center gap-2 transition-all duration-200"
+                >
+                  <MdLogout size={16} />
+                  <span>Logout</span>
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      )}
 
       <span className="md:hidden block" onClick={openDropDown}>
         <HiOutlineMenuAlt3 size={35} />

@@ -9,6 +9,7 @@ interface VerifyResponse {
     userId: string;
     email: string;
     first_name: string;
+    last_name: string;
   };
 }
 
@@ -50,6 +51,7 @@ export async function GET(
           userId: decoded.userId,
           email: decoded.email,
           first_name: decoded.first_name,
+          last_name: decoded.last_name,
         },
       },
       { status: 200 }

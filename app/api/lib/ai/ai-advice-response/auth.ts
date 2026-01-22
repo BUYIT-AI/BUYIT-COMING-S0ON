@@ -5,13 +5,14 @@ import { logger } from "@/app/lib/logger";
 export interface AuthUser {
   userId: string;
   first_name: string;
+  last_name: string;
   email: string;
   iat: number;
 }
 
 /**
  * Get authenticated user from token cookie
- * Extracts userId, first_name, and email from token
+ * Extracts userId, first_name, last_name, and email from token
  */
 export async function getAuthUser(): Promise<AuthUser | null> {
   try {
@@ -33,6 +34,7 @@ export async function getAuthUser(): Promise<AuthUser | null> {
     return {
       userId: decoded.userId,
       first_name: decoded.first_name,
+      last_name: decoded.last_name,
       email: decoded.email,
       iat: decoded.iat,
     } as AuthUser;

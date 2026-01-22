@@ -101,7 +101,7 @@ export async function POST(req: NextRequest): Promise<NextResponse<SignupRespons
     });
 
     // Generate JWT token
-    const token = generateToken(newUser.id, newUser.first_name, newUser.email);
+    const token = generateToken(newUser.id, newUser.first_name, newUser.last_name, newUser.email);
 
     // Return response with token in cookie
     const response = NextResponse.json(
