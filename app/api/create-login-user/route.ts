@@ -85,7 +85,7 @@ export async function POST(
     }
 
     // Generate JWT token
-    const token = generateToken(user.id, user.email, user.first_name);
+    const token = generateToken(user.id, user.first_name, user.email, );
 
     // Update last login time
     await prisma.presUser.update({

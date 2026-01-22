@@ -3,14 +3,17 @@ import "./globals.css";
 import { motion } from "framer-motion";
 import React, { useState } from "react";
 import { Poppins } from "next/font/google";
+import Head from "next/head";
 import Header from "./component/header";
 import Footer from "./component/footer";
+
 const poppins = Poppins({
   weight: ["400", "500", "600", "700", "800", "900"],
   subsets: ["latin"],
   display: "swap",
   variable: "--font-poppins", // CSS variable
 });
+
 export default function HomeLayout({
   children,
 }: {
@@ -20,6 +23,9 @@ export default function HomeLayout({
   const [form, setForm] = useState<boolean>(false);
   return (
     <html>
+      <Head>
+        <link rel="icon" href="/image/buyitlogo.png" />
+      </Head>
       <body className={` ${poppins.variable} md:px-20 px-5`}>
         {/* Header with its own animation */}
         <div className="blur"></div>
