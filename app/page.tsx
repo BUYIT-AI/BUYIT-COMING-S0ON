@@ -9,6 +9,7 @@ interface FormData {
   first_name: string;
   last_name: string;
   email: string;
+  password: string
 }
 export default function Page() {
   const [isLoading, setIsLoading] = useState(true);
@@ -19,6 +20,7 @@ export default function Page() {
     first_name: "",
     last_name: "",
     email: "",
+    password: ""
   });
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -36,6 +38,7 @@ export default function Page() {
           first_name: String(formData.first_name),
           last_name: String(formData.last_name),
           email: String(formData.email),
+          password: String(formData.password),
         }),
       });
 
@@ -54,6 +57,7 @@ export default function Page() {
         first_name: "",
         last_name: "",
         email: "",
+        password: ""
       });
     } catch (error) {
       console.error(error);
@@ -83,6 +87,14 @@ export default function Page() {
       placeholder: "Enter your email address",
       value: formData.email,
       type: "email",
+      onChange: handleChange,
+    },
+        {
+      name: "password",
+      label: "Password",
+      placeholder: "Enter your password",
+      value: formData.password,
+      type: "password",
       onChange: handleChange,
     },
   ];
