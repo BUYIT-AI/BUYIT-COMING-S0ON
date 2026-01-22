@@ -185,6 +185,18 @@ export default function Page() {
     checkAuth();
   }, []);
 
+  // Listen for logout event from header
+  useEffect(() => {
+    const handleLogout = () => {
+      setContainer(false);
+      setShowLoginForm(true);
+      setForm(false);
+    };
+
+    window.addEventListener("userLogout", handleLogout);
+    return () => window.removeEventListener("userLogout", handleLogout);
+  }, []);
+
   if (isLoading) {
     return <Loading />;
   }

@@ -78,7 +78,7 @@ export default function Header() {
     };
 
     checkUserAuth();
-    getInitials ();
+    getInitials();
   }, []);
 
   const openDropDown = () => {
@@ -110,8 +110,8 @@ export default function Header() {
         setUser(null);
         setShowUserMenu(false);
 
-        // Redirect to home
-        router.push("/");
+        // Dispatch logout event to notify page
+        window.dispatchEvent(new CustomEvent("userLogout"));
       } else {
         console.error("Logout failed");
       }
