@@ -71,6 +71,10 @@ export default function TableComponent({ search, recentUsers = [] }: Props) {
   const [isLoadingData, setIsLoadingData] = useState<boolean>(false);
   const [isSelected, setIsSelected] = useState<boolean>(false);
   const dropDownRef = useRef<HTMLDivElement | null>(null);
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const itemsPerPage = 10;
 
   const typeFunc = (type: "all" | "book" | "contact") => {};
 
@@ -174,6 +178,24 @@ export default function TableComponent({ search, recentUsers = [] }: Props) {
     });
   }, [dataToShow, search]);
 
+  // Pagination logic for regular users
+  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedUsers = filteredUsers.slice(startIndex, endIndex);
+
+  // Pagination logic for search results (combined)
+  const allSearchResults = [...filteredRecentUsers, ...filteredUsers];
+  const totalSearchPages = Math.ceil(allSearchResults.length / itemsPerPage);
+  const searchStartIndex = (currentPage - 1) * itemsPerPage;
+  const searchEndIndex = searchStartIndex + itemsPerPage;
+  const paginatedSearchResults = allSearchResults.slice(searchStartIndex, searchEndIndex);
+
+  // Reset pagination when search changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search]);
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
 
@@ -194,6 +216,15 @@ export default function TableComponent({ search, recentUsers = [] }: Props) {
   };
 
   const deleteUser = async (id: string, userType: string) => {
+    // Show confirmation dialog
+    const confirmed = confirm(
+      `Are you sure you want to delete this ${
+        userType === "SIGNUP" ? "member" : userType.toLowerCase()
+      }? This action cannot be undone.`
+    );
+
+    if (!confirmed) return;
+
     setIsLoadingData(true);
     if (userType === "SELLER") {
       try {
@@ -203,12 +234,16 @@ export default function TableComponent({ search, recentUsers = [] }: Props) {
         const data = await res.json();
         if (!res.ok) {
           setIsLoadingData(false);
+          alert("Failed to delete seller");
           return;
         }
         setIsLoadingData(false);
         setSeller((prev) => prev.filter((seller) => seller.id !== id));
+        alert("Seller deleted successfully");
       } catch (error) {
         console.error(error);
+        setIsLoadingData(false);
+        alert("Error deleting seller");
       }
     } else if (userType === "BUYER") {
       try {
@@ -218,12 +253,16 @@ export default function TableComponent({ search, recentUsers = [] }: Props) {
         const data = await res.json();
         if (!res.ok) {
           setIsLoadingData(false);
+          alert("Failed to delete buyer");
           return;
         }
         setIsLoadingData(false);
         setBuyer((prev) => prev.filter((buyer) => buyer.id !== id));
+        alert("Buyer deleted successfully");
       } catch (error) {
         console.error(error);
+        setIsLoadingData(false);
+        alert("Error deleting buyer");
       }
     } else if (userType === "CONTACT") {
       try {
@@ -233,17 +272,42 @@ export default function TableComponent({ search, recentUsers = [] }: Props) {
         const data = await res.json();
         if (!res.ok) {
           setIsLoadingData(false);
+          alert("Failed to delete contact");
           return;
         }
         setContact((prev) => prev.filter((contact) => contact.id !== id));
+        alert("Contact deleted successfully");
       } catch (error) {
         console.error(error);
+        setIsLoadingData(false);
+        alert("Error deleting contact");
+      }
+    } else if (userType === "SIGNUP") {
+      try {
+        const res = await fetch(`/api/delete-presuser/${id}`, {
+          method: "DELETE",
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          setIsLoadingData(false);
+          alert("Failed to delete member");
+          return;
+        }
+        setIsLoadingData(false);
+        // Remove from recentUsers - recentUsers will need to be managed by parent
+        alert("Member deleted successfully");
+        // Reload the page to update recent users
+        window.location.reload();
+      } catch (error) {
+        console.error(error);
+        setIsLoadingData(false);
+        alert("Error deleting member");
       }
     }
   };
 
   return (
-    <div className="w-full h-full mb-4 overflow-auto scroll bg-[#272a31]  md:p-5 p-3 my-2 rounded-[15px] flex justify-start items-start flex-col gap-3">
+    <div className="w-full h-[95vh] mb-4 overflow-auto scroll bg-[#272a31]  md:p-5 p-3 my-2 rounded-[15px] flex justify-start items-start flex-col gap-3" style={{ contain: 'layout style paint' } as React.CSSProperties}>
       {/* Search Bar - Only show when not searching or show all results */}
       {!search && (
         <>
@@ -260,26 +324,38 @@ export default function TableComponent({ search, recentUsers = [] }: Props) {
                       <th className="text-left py-2 px-3 text-white/50">Name</th>
                       <th className="text-left py-2 px-3 text-white/50">Email</th>
                       <th className="text-left py-2 px-3 text-white/50">Joined</th>
+                      <th className="text-left py-2 px-3 text-white/50">Action</th>
                     </tr>
                   </thead>
                   <tbody>
                     {recentUsers.map((user) => (
                       <tr 
                         key={user.id} 
-                        className="border-b border-white/5 hover:bg-white/5 transition-all cursor-pointer"
-                        onClick={() => showRecentUserDetails(user)}
+                        className="border-b border-white/5 hover:bg-white/5 transition-all"
                       >
-                        <td className="py-3 px-3">
+                        <td className="py-3 px-3 cursor-pointer" onClick={() => showRecentUserDetails(user)}>
                           <div className="flex items-center gap-2">
-                            <div className="h-8 w-8 bg-gradient-to-br from-purple-600 to-purple-800 rounded-full flex items-center justify-center text-xs font-semibold">
+                            <div className="h-8 w-8 bg-linear-to-br from-purple-600 to-purple-800 rounded-full flex items-center justify-center text-xs font-semibold">
                               {user.first_name.charAt(0)}{user.last_name.charAt(0)}
                             </div>
                             <span className="text-white/80">{user.first_name} {user.last_name}</span>
                           </div>
                         </td>
-                        <td className="py-3 px-3 text-white/60 text-sm">{user.email}</td>
-                        <td className="py-3 px-3 text-white/60 text-sm">
+                        <td className="py-3 px-3 text-white/60 text-sm cursor-pointer" onClick={() => showRecentUserDetails(user)}>{user.email}</td>
+                        <td className="py-3 px-3 text-white/60 text-sm cursor-pointer" onClick={() => showRecentUserDetails(user)}>
                           {formatDate(user.createdAt)}
+                        </td>
+                        <td className="py-3 px-3">
+                          <button 
+                            className="text-white/50 hover:text-red-500 transition-all"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              deleteUser(user.id, "SIGNUP");
+                            }}
+                            title="Delete member"
+                          >
+                            <IoMdTrash />
+                          </button>
                         </td>
                       </tr>
                     ))}
@@ -316,8 +392,8 @@ export default function TableComponent({ search, recentUsers = [] }: Props) {
           <MdRefresh />
         </button>
       </div>
-      <div className="overflow-auto scroll2 w-full">
-        <table className="min-w-full w-full scroll2 overflow-auto">
+      <div className="overflow-auto scroll2 w-full" style={{ contain: 'content' } as React.CSSProperties}>
+        <table className="min-w-full w-full scroll2 overflow-auto" style={{ borderCollapse: 'collapse' }}>
           <thead className="text-left text-white bg-[#202427]">
             <tr className="w-full">
               <td className="th tracking-wider">User Name</td>
@@ -336,129 +412,92 @@ export default function TableComponent({ search, recentUsers = [] }: Props) {
               </tr>
             ) : search ? (
               // Show filtered results from BOTH recent users and regular users when searching
-              filteredRecentUsers.length > 0 || filteredUsers.length > 0 ? (
+              allSearchResults.length > 0 ? (
                 <>
-                  {/* Filtered Recent Users */}
-                  {filteredRecentUsers.map((u) => (
-                    <tr
-                      key={u.id}
-                      className="hover:bg-white/5 w-full pt-2 cursor-pointer"
-                      onClick={() => showRecentUserDetails(u)}
-                    >
-                      <td>
-                        <div className="flex items-center gap-2 pl-3 md:py-2 py-5">
-                          <span className="h-10 w-10 flex justify-center items-center bg-purple-900/30 text-purple-700 rounded-full md:text-[0.8rem] font-semibold uppercase">
-                            {u.first_name.charAt(0)}{u.last_name.charAt(0)}
-                          </span>
-                          <div className="flex flex-col gap-1">
-                            <h1 className="text-white/80 text-[1rem]">
-                              {u.first_name} {u.last_name}
-                            </h1>
-                            <span className="text-white/30 text-[0.8rem]">
-                              {u.email}
-                            </span>
-                          </div>
-                        </div>
-                      </td>
-                      <td>
-                        <div className="pl-3 text-white/50 text-[0.8rem] line-clamp-1 md:line-clamp-none">
-                          #{u.id}
-                        </div>
-                      </td>
-                      <td>
-                        <div className="bg-purple-900/30 text-purple-700 inline-flex items-center gap-1 text-[0.8rem] rounded-full px-3 py-1">
-                          🎉 New Member
-                        </div>
-                      </td>
-                      <td>
-                        <div className="pl-3 text-white/50 text-[0.8rem]">
-                          {formatDate(u.createdAt)}
-                        </div>
-                      </td>
-                      <td className="pl-3">
-                        <button 
-                          className="text-white/50 hover:text-red-500 transition-all"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                          }}
-                        >
-                          <IoMdTrash />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                  {/* Filtered Regular Users */}
-                  {filteredUsers.map((u, i) => (
-                    <tr
-                      key={i}
-                      className="hover:bg-white/5 w-full pt-2 cursor-pointer"
-                      onClick={() => showDetailsFunc(u.id, u.type)}
-                    >
-                      <td>
-                        <div className="flex items-center gap-2 pl-3 md:py-2 py-5">
-                          <span
-                            className={`h-10 w-10 flex justify-center items-center ${
-                              u.type === "SELLER"
+                  {/* Paginated Search Results */}
+                  {paginatedSearchResults.map((u) => {
+                    // Determine if this is a recent user or regular user
+                    const isRecentUser = "first_name" in u && u.type === "SIGNUP";
+                    
+                    return (
+                      <tr
+                        key={u.id}
+                        className="hover:bg-white/5 w-full pt-2 cursor-pointer"
+                        onClick={() => 
+                          isRecentUser 
+                            ? showRecentUserDetails(u as RecentUser) 
+                            : showDetailsFunc(u.id, u.type || 'CONTACT')
+                        }
+                      >
+                        <td>
+                          <div className="flex items-center gap-2 pl-3 md:py-2 py-5">
+                            <span className={`h-10 w-10 flex justify-center items-center ${
+                              isRecentUser
+                                ? "bg-purple-900/30 text-purple-700"
+                                : u.type === "SELLER"
                                 ? "bg-purple-900/30 text-purple-700"
                                 : u.type === "BUYER"
                                 ? "bg-blue-600/30 text-blue-700"
                                 : "bg-green-600/30 text-green-700"
-                            } rounded-full md:text-[0.8rem] font-semibold uppercase`}
-                          >
-                            {"name" in u
-                              ? u.name.charAt(0)
-                              : `${u.first_name.charAt(0)}${u.last_name.charAt(0)}`}
-                          </span>
-
-                          <div className="flex flex-col gap-1">
-                            <h1 className="text-white/80 text-[1rem]">
-                              {"name" in u
-                                ? u.name
-                                : `${u.first_name} ${u.last_name}`}
-                            </h1>
-                            <span className="text-white/30 text-[0.8rem]">
-                              {u.email}
+                            } rounded-full md:text-[0.8rem] font-semibold uppercase`}>
+                              {"first_name" in u
+                                ? `${u.first_name.charAt(0)}${u.last_name.charAt(0)}`
+                                : ("name" in u
+                                  ? u.name.charAt(0)
+                                  : "U")}
                             </span>
+                            <div className="flex flex-col gap-1">
+                              <h1 className="text-white/80 text-[1rem]">
+                                {"first_name" in u
+                                  ? `${u.first_name} ${u.last_name}`
+                                  : "name" in u
+                                  ? u.name
+                                  : "User"}
+                              </h1>
+                              <span className="text-white/30 text-[0.8rem]">
+                                {u.email}
+                              </span>
+                            </div>
                           </div>
-                        </div>
-                      </td>
-
-                      <td>
-                        <div className="pl-3 text-white/50 text-[0.8rem] line-clamp-1 md:line-clamp-none">
-                          #{u.id}
-                        </div>{" "}
-                      </td>
-
-                      <td>
-                        <div
-                          className={`${
-                            u.type === "SELLER"
+                        </td>
+                        <td>
+                          <div className="pl-3 text-white/50 text-[0.8rem] line-clamp-1 md:line-clamp-none">
+                            #{u.id}
+                          </div>
+                        </td>
+                        <td>
+                          <div className={`${
+                            isRecentUser
+                              ? "bg-purple-900/30 text-purple-700"
+                              : u.type === "SELLER"
                               ? "bg-purple-900/30 text-purple-700"
                               : u.type === "BUYER"
                               ? "bg-blue-600/30 text-blue-700"
                               : "bg-green-600/30 text-green-700"
-                          } w-20 text-[0.8rem] px-1 py-1 rounded-full flex justify-center items-center`}
-                        >
-                          {u.type}
-                        </div>
-                      </td>
-
-                      <td>
-                        <div className="pl-3 text-white/50 text-[0.8rem]">
-                          {formatDate(u.createdAt)}
-                        </div>
-                      </td>
-
-                      <td className="pl-3 flex gap-3">
-                        <button
-                          onClick={() => deleteUser(u.id, u.type)}
-                          className="text-white/50 hover:text-red-500 transition-all"
-                        >
-                          <IoMdTrash />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
+                          } inline-flex items-center gap-1 text-[0.8rem] rounded-full px-3 py-1`}>
+                            {isRecentUser ? "🎉 New Member" : u.type}
+                          </div>
+                        </td>
+                        <td>
+                          <div className="pl-3 text-white/50 text-[0.8rem]">
+                            {formatDate(u.createdAt)}
+                          </div>
+                        </td>
+                        <td className="pl-3">
+                          <button 
+                            className="text-white/50 hover:text-red-500 transition-all"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              deleteUser(u.id, isRecentUser ? "SIGNUP" : (u.type || 'CONTACT'));
+                            }}
+                            title="Delete"
+                          >
+                            <IoMdTrash />
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </>
               ) : (
                 <tr>
@@ -468,7 +507,7 @@ export default function TableComponent({ search, recentUsers = [] }: Props) {
                 </tr>
               )
             ) : filteredUsers.length > 0 ? (
-              filteredUsers.map((u, i) => (
+              paginatedUsers.map((u, i) => (
                 <tr
                   key={i}
                   className="hover:bg-white/5 w-full pt-2 cursor-pointer"
@@ -556,6 +595,83 @@ export default function TableComponent({ search, recentUsers = [] }: Props) {
           </tbody>
         </table>
       </div>
+
+      {/* Pagination Controls */}
+      {!search && filteredUsers.length > itemsPerPage && (
+        <div className="w-full flex justify-between items-center px-3 py-3 bg-[#1a1d23] rounded-lg mt-4 gap-4">
+          <button
+            onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+            disabled={currentPage === 1}
+            className={`px-4 py-2 rounded-lg font-medium transition-all ${
+              currentPage === 1
+                ? "bg-white/10 text-white/30 cursor-not-allowed"
+                : "bg-white text-[#0f0f0f] hover:bg-white/90"
+            }`}
+          >
+            ← Previous
+          </button>
+          
+          <div className="flex items-center gap-2">
+            <span className="text-white text-sm">
+              Page <span className="font-bold">{currentPage}</span> of <span className="font-bold">{totalPages}</span>
+            </span>
+            <span className="text-white/50 text-xs">
+              ({paginatedUsers.length} of {filteredUsers.length} users)
+            </span>
+          </div>
+
+          <button
+            onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+            disabled={currentPage === totalPages}
+            className={`px-4 py-2 rounded-lg font-medium transition-all ${
+              currentPage === totalPages
+                ? "bg-white/10 text-white/30 cursor-not-allowed"
+                : "bg-white text-[#0f0f0f] hover:bg-white/90"
+            }`}
+          >
+            Next →
+          </button>
+        </div>
+      )}
+
+      {/* Search Results Pagination */}
+      {search && allSearchResults.length > itemsPerPage && (
+        <div className="w-full flex justify-between items-center px-3 py-3 bg-[#1a1d23] rounded-lg mt-4 gap-4">
+          <button
+            onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+            disabled={currentPage === 1}
+            className={`px-4 py-2 rounded-lg font-medium transition-all ${
+              currentPage === 1
+                ? "bg-white/10 text-white/30 cursor-not-allowed"
+                : "bg-white text-[#0f0f0f] hover:bg-white/90"
+            }`}
+          >
+            ← Previous
+          </button>
+
+          <div className="flex items-center gap-2">
+            <span className="text-white text-sm">
+              Page <span className="font-bold">{currentPage}</span> of <span className="font-bold">{totalSearchPages}</span>
+            </span>
+            <span className="text-white/50 text-xs">
+              ({paginatedSearchResults.length} of {allSearchResults.length} results)
+            </span>
+          </div>
+
+          <button
+            onClick={() => setCurrentPage(prev => Math.min(totalSearchPages, prev + 1))}
+            disabled={currentPage === totalSearchPages}
+            className={`px-4 py-2 rounded-lg font-medium transition-all ${
+              currentPage === totalSearchPages
+                ? "bg-white/10 text-white/30 cursor-not-allowed"
+                : "bg-white text-[#0f0f0f] hover:bg-white/90"
+            }`}
+          >
+            Next →
+          </button>
+        </div>
+      )}
+
       {/* Sidebar*/}
       <div
         className={`fixed top-0 right-0 h-full md:w-90 w-full bg-[#272a31] drop-shadow-2xl py-9 flex  flex-col ${

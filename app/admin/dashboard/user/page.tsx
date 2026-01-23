@@ -42,7 +42,7 @@ export default function User() {
   }, []);
 
   return (
-    <div className="p-3 w-full h-full relative">
+    <div className="p-3 w-full min-h-screen relative">
       <header className="flex md:gap-10 gap-2 items-center md:justify-between w-full">
         <h1 className="text-white md:text-[30px] text-[23px] font-semibold">
           User
