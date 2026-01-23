@@ -33,6 +33,14 @@ interface Buyer {
   id: string;
 }
 
+interface RecentUser {
+  id: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  createdAt: string;
+}
+
 export default function Page() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [users, setUsers] = useState<Data[]>([]);
@@ -40,6 +48,9 @@ export default function Page() {
   const [seller, setSeller] = useState<Seller[]>([]);
   const [buyer, setBuyer] = useState<Buyer[]>([]);
   const [contact, setContact] = useState<Contact[]>([]);
+  const [recentUsers, setRecentUsers] = useState<RecentUser[]>([]);
+  const [recentUsersCount, setRecentUsersCount] = useState<number>(0);
+
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
   };
@@ -60,7 +71,6 @@ export default function Page() {
         setContact(data.data.contact);
         setBuyer(data.data.buyer);
         setSeller(data.data.seller);
-        console.log(data);
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -69,6 +79,30 @@ export default function Page() {
     };
 
     fetchDetails();
+  }, []);
+
+  // Fetch recent users
+  useEffect(() => {
+    const fetchRecentUsers = async () => {
+      try {
+        const res = await fetch(`/api/fetch-recent-users`);
+        const data = await res.json();
+
+        if (res.ok && data.success && Array.isArray(data.data?.users)) {
+          setRecentUsers(data.data.users);
+          setRecentUsersCount(data.data.count);
+        } else {
+          setRecentUsers([]);
+          setRecentUsersCount(0);
+        }
+      } catch (error) {
+        console.error("Error fetching recent users:", error);
+        setRecentUsers([]);
+        setRecentUsersCount(0);
+      }
+    };
+
+    fetchRecentUsers();
   }, []);
 
   return (
@@ -97,10 +131,10 @@ export default function Page() {
 
         <div className="w-full h-full my-10">
           <div
-            className={`grid md:grid-cols-[repeat(3,24%)] grid-cols-2 
+            className={`md:grid md:grid-cols-[repeat(4,22%)] flex overflow-x-auto scroll2 scrollbar-none md:max-w-full w-full
               gap-8 transition-all duration-150`}
           >
-            <div className="p-6 bg-[#272a31] rounded-[15px] border border-white/5 md:flex flex-col justify-center hidden">
+            <div className="p-6 bg-[#272a31] rounded-[15px] border border-white/5 flex flex-col justify-center min-w-[50%] md:min-w-auto ">
               <h1 className="text-white/30">Total Users</h1>
               <div className="flex justify-between items-center">
                 <span className="text-white text-[1.3rem] font-semibold">
@@ -111,7 +145,7 @@ export default function Page() {
                 </span>
               </div>
             </div>
-            <div className="p-6 bg-[#272a31] rounded-[15px] border border-white/5 flex flex-col justify-center">
+            <div className="p-6 bg-[#272a31] rounded-[15px] border border-white/5 flex flex-col justify-center min-w-[50%] md:min-w-auto ">
               <h1 className="text-white/30">Booked Users</h1>
               <div className="flex justify-between items-center">
                 <span className="text-white text-[1.3rem] font-semibold">
@@ -123,7 +157,7 @@ export default function Page() {
               </div>
             </div>
 
-            <div className="p-6 bg-[#272a31] rounded-[15px] border border-white/5 flex flex-col justify-center overflow-auto">
+            <div className="p-6 bg-[#272a31] rounded-[15px] border border-white/5 flex flex-col justify-center min-w-[50%] md:min-w-auto ">
               <h1 className="text-white/30">Contacted Users</h1>
               <div className="flex justify-between items-center">
                 <span className="text-white text-[1.3rem] font-semibold">
@@ -134,9 +168,21 @@ export default function Page() {
                 </span>
               </div>
             </div>
+
+            <div className="p-6 bg-[#272a31] rounded-[15px] border border-white/5 flex flex-col justify-center min-w-[50%] md:min-w-auto ">
+              <h1 className="text-white/30">Recently Joined</h1>
+              <div className="flex justify-between items-center">
+                <span className="text-white text-[1.3rem] font-semibold">
+                  {recentUsersCount}
+                </span>
+                <span className="h-9 w-9 bg-purple-800/30 text-purple-800 flex justify-center items-center rounded">
+                  <MdGroup />
+                </span>
+              </div>
+            </div>
           </div>
 
-          <TableComponent search={search} />
+          <TableComponent search={search} recentUsers={recentUsers} />
         </div>
       </div>
     </div>

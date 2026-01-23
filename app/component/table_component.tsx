@@ -39,13 +39,23 @@ interface Buyer {
   createdAt: string;
 }
 
+interface RecentUser {
+  id: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  createdAt: string;
+  type?: string; // Add type field for consistency
+}
+
 interface Props {
   search: string;
+  recentUsers?: RecentUser[];
 }
 
 type User = Contact | Seller | Buyer;
 
-export default function TableComponent({ search }: Props) {
+export default function TableComponent({ search, recentUsers = [] }: Props) {
   const [type, setType] = useState<"all" | "contact" | "buyer" | "seller">(
     "all"
   );
@@ -102,6 +112,20 @@ export default function TableComponent({ search }: Props) {
     setUserDetails(null);
   };
 
+  // Function to handle displaying recent user details
+  const showRecentUserDetails = (user: RecentUser) => {
+    setShowDetails(true);
+    // For recent users, we display them directly since we have their info
+    setUserDetails({
+      id: user.id,
+      first_name: user.first_name,
+      last_name: user.last_name,
+      email: user.email,
+      type: "SIGNUP",
+      createdAt: user.createdAt,
+    } as any);
+  };
+
   const refreshUser = () => {
     fetchAll();
   };
@@ -120,6 +144,17 @@ export default function TableComponent({ search }: Props) {
   };
 
   const dataToShow = allData();
+
+  // Filter recent users based on search
+  const filteredRecentUsers = useMemo(() => {
+    if (!Array.isArray(recentUsers)) return [];
+    return recentUsers.filter((u) => {
+      const fullName = `${u.first_name} ${u.last_name}`.toLowerCase();
+      const email = u.email.toLowerCase();
+      const searchLower = search.toLowerCase();
+      return fullName.includes(searchLower) || email.includes(searchLower);
+    });
+  }, [recentUsers, search]);
 
   const filteredUsers = useMemo(() => {
     return dataToShow.filter((u) => {
@@ -209,9 +244,68 @@ export default function TableComponent({ search }: Props) {
 
   return (
     <div className="w-full h-full mb-4 overflow-auto scroll bg-[#272a31]  md:p-5 p-3 my-2 rounded-[15px] flex justify-start items-start flex-col gap-3">
+      {/* Search Bar - Only show when not searching or show all results */}
+      {!search && (
+        <>
+          {/* Recently Joined Users Section - Hide when searching */}
+          {recentUsers.length > 0 && (
+            <div className="w-full mb-6 pb-6 border-b border-white/10">
+              <h2 className="text-white font-semibold text-[15px] mb-3">
+                🎉 Newest Members
+              </h2>
+              <div className="overflow-x-auto">
+                <table className="w-full text-white text-sm">
+                  <thead className="border-b border-white/10">
+                    <tr>
+                      <th className="text-left py-2 px-3 text-white/50">Name</th>
+                      <th className="text-left py-2 px-3 text-white/50">Email</th>
+                      <th className="text-left py-2 px-3 text-white/50">Joined</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {recentUsers.map((user) => (
+                      <tr 
+                        key={user.id} 
+                        className="border-b border-white/5 hover:bg-white/5 transition-all cursor-pointer"
+                        onClick={() => showRecentUserDetails(user)}
+                      >
+                        <td className="py-3 px-3">
+                          <div className="flex items-center gap-2">
+                            <div className="h-8 w-8 bg-gradient-to-br from-purple-600 to-purple-800 rounded-full flex items-center justify-center text-xs font-semibold">
+                              {user.first_name.charAt(0)}{user.last_name.charAt(0)}
+                            </div>
+                            <span className="text-white/80">{user.first_name} {user.last_name}</span>
+                          </div>
+                        </td>
+                        <td className="py-3 px-3 text-white/60 text-sm">{user.email}</td>
+                        <td className="py-3 px-3 text-white/60 text-sm">
+                          {formatDate(user.createdAt)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </>
+      )}
+
+      {/* Search Results Title - Show when searching */}
+      {search && (
+        <div className="w-full mb-4">
+          <h2 className="text-white font-semibold text-[15px]">
+            Search Results for "{search}"
+          </h2>
+          <p className="text-white/50 text-sm mt-1">
+            Found {filteredRecentUsers.length + filteredUsers.length} result{(filteredRecentUsers.length + filteredUsers.length) !== 1 ? "s" : ""}
+          </p>
+        </div>
+      )}
+
       <div className="flex justify-between items-center w-full">
         <h1 className="text-[15px] text-white font-semibold">
-          Recent Upcoming Users
+          Recent Booked Users
         </h1>
         <button
           className={`${
@@ -240,6 +334,139 @@ export default function TableComponent({ search }: Props) {
                   <LoadingComponent />
                 </td>
               </tr>
+            ) : search ? (
+              // Show filtered results from BOTH recent users and regular users when searching
+              filteredRecentUsers.length > 0 || filteredUsers.length > 0 ? (
+                <>
+                  {/* Filtered Recent Users */}
+                  {filteredRecentUsers.map((u) => (
+                    <tr
+                      key={u.id}
+                      className="hover:bg-white/5 w-full pt-2 cursor-pointer"
+                      onClick={() => showRecentUserDetails(u)}
+                    >
+                      <td>
+                        <div className="flex items-center gap-2 pl-3 md:py-2 py-5">
+                          <span className="h-10 w-10 flex justify-center items-center bg-purple-900/30 text-purple-700 rounded-full md:text-[0.8rem] font-semibold uppercase">
+                            {u.first_name.charAt(0)}{u.last_name.charAt(0)}
+                          </span>
+                          <div className="flex flex-col gap-1">
+                            <h1 className="text-white/80 text-[1rem]">
+                              {u.first_name} {u.last_name}
+                            </h1>
+                            <span className="text-white/30 text-[0.8rem]">
+                              {u.email}
+                            </span>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <div className="pl-3 text-white/50 text-[0.8rem] line-clamp-1 md:line-clamp-none">
+                          #{u.id}
+                        </div>
+                      </td>
+                      <td>
+                        <div className="bg-purple-900/30 text-purple-700 inline-flex items-center gap-1 text-[0.8rem] rounded-full px-3 py-1">
+                          🎉 New Member
+                        </div>
+                      </td>
+                      <td>
+                        <div className="pl-3 text-white/50 text-[0.8rem]">
+                          {formatDate(u.createdAt)}
+                        </div>
+                      </td>
+                      <td className="pl-3">
+                        <button 
+                          className="text-white/50 hover:text-red-500 transition-all"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                          }}
+                        >
+                          <IoMdTrash />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                  {/* Filtered Regular Users */}
+                  {filteredUsers.map((u, i) => (
+                    <tr
+                      key={i}
+                      className="hover:bg-white/5 w-full pt-2 cursor-pointer"
+                      onClick={() => showDetailsFunc(u.id, u.type)}
+                    >
+                      <td>
+                        <div className="flex items-center gap-2 pl-3 md:py-2 py-5">
+                          <span
+                            className={`h-10 w-10 flex justify-center items-center ${
+                              u.type === "SELLER"
+                                ? "bg-purple-900/30 text-purple-700"
+                                : u.type === "BUYER"
+                                ? "bg-blue-600/30 text-blue-700"
+                                : "bg-green-600/30 text-green-700"
+                            } rounded-full md:text-[0.8rem] font-semibold uppercase`}
+                          >
+                            {"name" in u
+                              ? u.name.charAt(0)
+                              : `${u.first_name.charAt(0)}${u.last_name.charAt(0)}`}
+                          </span>
+
+                          <div className="flex flex-col gap-1">
+                            <h1 className="text-white/80 text-[1rem]">
+                              {"name" in u
+                                ? u.name
+                                : `${u.first_name} ${u.last_name}`}
+                            </h1>
+                            <span className="text-white/30 text-[0.8rem]">
+                              {u.email}
+                            </span>
+                          </div>
+                        </div>
+                      </td>
+
+                      <td>
+                        <div className="pl-3 text-white/50 text-[0.8rem] line-clamp-1 md:line-clamp-none">
+                          #{u.id}
+                        </div>{" "}
+                      </td>
+
+                      <td>
+                        <div
+                          className={`${
+                            u.type === "SELLER"
+                              ? "bg-purple-900/30 text-purple-700"
+                              : u.type === "BUYER"
+                              ? "bg-blue-600/30 text-blue-700"
+                              : "bg-green-600/30 text-green-700"
+                          } w-20 text-[0.8rem] px-1 py-1 rounded-full flex justify-center items-center`}
+                        >
+                          {u.type}
+                        </div>
+                      </td>
+
+                      <td>
+                        <div className="pl-3 text-white/50 text-[0.8rem]">
+                          {formatDate(u.createdAt)}
+                        </div>
+                      </td>
+
+                      <td className="pl-3 flex gap-3">
+                        <button
+                          onClick={() => deleteUser(u.id, u.type)}
+                          className="text-white/50 hover:text-red-500 transition-all"
+                        >
+                          <IoMdTrash />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </>
+              ) : (
+                <tr>
+                  <td colSpan={6} className="text-center py-6 text-white/50">
+                    No users found matching "{search}"
+                  </td>
+                </tr>
+              )
             ) : filteredUsers.length > 0 ? (
               filteredUsers.map((u, i) => (
                 <tr
@@ -389,7 +616,28 @@ export default function TableComponent({ search }: Props) {
                   </div>
                 </div>
                 <div className="mt-6 w-full px-4 space-y-3">
-                  {userDetails.type === "SELLER" ? (
+                  {userDetails.type === "SIGNUP" ? (
+                    <div className="space-y-2">
+                      <div className="bg-purple-900/10 border border-purple-900/30 rounded-lg p-3">
+                        <p className="text-white/50 text-xs uppercase tracking-wider">
+                          Member Since
+                        </p>
+                        <p className="text-white font-semibold text-sm">
+                          {"createdAt" in userDetails
+                            ? new Date(userDetails.createdAt).toLocaleDateString()
+                            : "N/A"}
+                        </p>
+                      </div>
+                      <div className="bg-purple-900/10 border border-purple-900/30 rounded-lg p-3">
+                        <p className="text-white/50 text-xs uppercase tracking-wider">
+                          Email
+                        </p>
+                        <p className="text-white font-semibold text-sm break-all">
+                          {userDetails.email}
+                        </p>
+                      </div>
+                    </div>
+                  ) : userDetails.type === "SELLER" ? (
                     <div className="space-y-2">
                       <div className="bg-purple-900/10 border border-purple-900/30 rounded-lg p-3">
                         <p className="text-white/50 text-xs uppercase tracking-wider">
